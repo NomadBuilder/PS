@@ -1,7 +1,8 @@
 <!--
   GTM: ONE Custom HTML tag — Living My Culture keeps real header/footer.
 
-  Mount: replaces everything INSIDE the first div.center (Umbraco main column).
+  Mount: replaces everything INSIDE the main column div.center (not the first
+  .center in the document — LMC can have several; we pick the culture grid column).
   Use a trigger so this tag only fires when you want (e.g. Page Path contains
   /culture/ AND Query contains programs — see PS/README.md).
 
@@ -24,10 +25,43 @@
     }
     */
 
-    var center =
-      document.querySelector("div.center") || document.querySelector(".center");
+    function findProgramsMountRoot() {
+      var list = document.querySelectorAll("div.center");
+      var i;
+      for (i = 0; i < list.length; i++) {
+        if (list[i].querySelector(".culture-list, .cl-item")) {
+          return list[i];
+        }
+      }
+      var scoped =
+        document.querySelector("main div.center") ||
+        document.querySelector("#content div.center") ||
+        document.querySelector("#main div.center") ||
+        document.querySelector("article div.center");
+      if (scoped) {
+        return scoped;
+      }
+      if (!list.length) {
+        return document.querySelector(".center");
+      }
+      if (list.length === 1) {
+        return list[0];
+      }
+      var best = list[0];
+      var bestH = 0;
+      for (i = 0; i < list.length; i++) {
+        var h = list[i].clientHeight;
+        if (h > bestH) {
+          bestH = h;
+          best = list[i];
+        }
+      }
+      return best;
+    }
+
+    var center = findProgramsMountRoot();
     if (!center) {
-      console.warn("[LMC programs] No div.center found; widget not mounted.");
+      console.warn("[LMC programs] No mount root (.center) found; widget not mounted.");
       return;
     }
     if (center.querySelector(".lmc-programs-gtm-root")) {

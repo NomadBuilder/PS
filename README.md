@@ -8,7 +8,7 @@
 
 ## Header / footer
 
-- **GTM on Living My Culture (`gtm-custom-html.html`):** the snippet **replaces only the contents of `div.center`** (the main column). The real **LMC header and footer stay**; we do **not** load `aboutgrief-chrome.js` there.
+- **GTM on Living My Culture (`gtm-custom-html.html`):** the snippet **replaces only the contents of the main `div.center`** (the column that holds the culture grid — **not** the first `div.center` on the page, since Umbraco can output several). The real **LMC header and footer stay**; we do **not** load `aboutgrief-chrome.js` there.
 - **Standalone demo on GitHub Pages (`index.html`):** still uses **`aboutgrief-chrome.js`** to show About Grief’s header/footer in Shadow DOM, because **`X-Frame-Options`** blocks a normal cross-origin iframe of aboutgrief.ca.
 
 ## GTM on LMC
