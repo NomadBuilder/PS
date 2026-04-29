@@ -21,9 +21,10 @@
   --lmc-white: #fff;
   --lmc-max: 1100px;
   --font-display: Capriola, MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  /* Programs page hero (warm title + body teal; aligns with LMC / reference layout) */
-  --lmc-programs-hero-title: #ce5b48;
+  --lmc-programs-hero-title: rgb(108, 35, 115);
   --lmc-programs-hero-lead: #215352;
+  /* National / International + category row titles (Advocacy, Support Groups, …) */
+  --lmc-programs-section-heading: #0557b4;
 }
 
 *,
@@ -446,14 +447,10 @@ a:hover {
 }
 
 .program-service__title {
-  margin: 0 0 5px;
-  padding: 0;
+  margin: 1.5rem 0 12px;
+  padding: 8px 0 0;
   font: 400 30px/1.2 var(--font-display);
-  color: var(--ag-heading);
-}
-
-.program-service__title:first-child {
-  margin-top: 0;
+  color: var(--lmc-programs-section-heading);
 }
 
 .program-service__text-block {
@@ -482,12 +479,12 @@ a:hover {
 
 .program-service-block .faq > .faq__items:first-child,
 .faq__items:first-of-type {
-  margin-top: 4px;
+  margin-top: 14px;
   padding-top: 0;
 }
 
 .program-service-block .faq > .faq__items + .faq__items {
-  margin-top: 1.75rem;
+  margin-top: 2rem;
 }
 
 .faq__item-accordion {
@@ -496,7 +493,7 @@ a:hover {
   justify-content: space-between;
   gap: 12px;
   margin: 0;
-  padding: 6px 0 8px;
+  padding: 14px 0 10px;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -508,16 +505,15 @@ a:hover {
   background: rgba(0, 166, 201, 0.04);
 }
 
-/* About Grief: .program-service .h3 — 25px Capriola #317d73 */
 .faq__item-accordion .h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin: 5px 0;
+  margin: 6px 0 4px;
   padding: 0;
   font: 400 25px/1.2 var(--font-display);
-  color: var(--ag-heading);
+  color: var(--lmc-programs-section-heading);
   cursor: pointer;
 }
 
