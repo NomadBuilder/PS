@@ -8,14 +8,19 @@
   --lmc-text-muted: #527883;
   --lmc-link: #018391;
   --lmc-link-hover: #106476;
+  /* About Grief display heading hue (Capriola on AG); keeps LMC-adjacent teal */
+  --ag-heading: #317d73;
   --lmc-navy: #27326b;
   --lmc-navy-hover: #315a85;
   --lmc-culture: #00a6c9;
+  /* AG faq__items top rule */
+  --ag-faq-rule: #89d1ca;
   --lmc-divider: #bcdfe6;
   --lmc-divider-soft: #dfdfdf;
   --lmc-input-border: #d5dad1;
   --lmc-white: #fff;
   --lmc-max: 1100px;
+  --font-display: Capriola, MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -173,7 +178,7 @@ a:hover {
 .program-service h2.h2 {
   margin: 0 0 12px;
   padding: 0;
-  font: 400 24px/30px MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 400 24px/30px var(--font-display);
   color: var(--lmc-link);
 }
 
@@ -210,19 +215,22 @@ a:hover {
   letter-spacing: 0.01em;
 }
 
-.program-service__form .form-select,
-.program-service__form .form-input {
+.program-service .form-select,
+.program-service .form-input {
   width: 100%;
-  padding: 10px 12px;
-  font: normal 16px/1.35 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: var(--lmc-text);
+  max-width: 220px;
+  height: 38px;
+  padding: 8px 7px;
+  font: normal 16px/1.25 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #4c5069;
   border: 1px solid var(--lmc-input-border);
-  border-radius: 2px;
+  border-radius: 10px;
   background: var(--lmc-white);
+  box-sizing: border-box;
 }
 
-.program-service__form .form-select:focus,
-.program-service__form .form-input:focus {
+.program-service .form-select:focus,
+.program-service .form-input:focus {
   outline: 2px solid rgba(0, 166, 201, 0.35);
   outline-offset: 0;
   border-color: var(--lmc-culture);
@@ -288,19 +296,20 @@ a:hover {
 }
 
 .program-service__lists {
-  padding: 10px 0 10px;
+  padding: 10px 15px 10px;
   color: var(--lmc-text);
   border-radius: 0;
 }
 
 .program-service__lists .mb-20 {
-  margin-bottom: 14px;
-  font-size: 16px;
-  line-height: 1.45;
+  margin-bottom: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--lmc-text);
 }
 
 .program-service__lists .mb-20 i {
-  color: var(--lmc-text-muted);
+  color: var(--lmc-text);
   font-style: italic;
 }
 
@@ -312,15 +321,19 @@ a:hover {
 
 .program-service__lists .click-text.display-default-all-sites,
 .program-service__lists .click-text.display-grief {
-  color: var(--lmc-text-muted);
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--lmc-text);
   font-style: italic;
 }
 
 .program-service__title {
-  margin: 8px 0 6px;
+  margin: 0 0 5px;
   padding: 0;
-  font: 400 28px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: var(--lmc-link);
+  font: 400 30px/1.2 var(--font-display);
+  color: var(--ag-heading);
 }
 
 .program-service__title:first-child {
@@ -339,22 +352,24 @@ a:hover {
   font-weight: 600;
 }
 
-/* Category blocks: teal top rule like About Grief .faq__items */
+/* Category blocks — About Grief .faq__items spacing + rule */
 .faq__items {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  padding-top: 20px;
   border: none;
-  border-top: 1px solid var(--lmc-divider);
-  margin-top: 18px;
-  margin-bottom: 14px;
-  padding-top: 18px;
+  border-top: 1px solid var(--ag-faq-rule);
   border-radius: 0;
   background: transparent;
 }
 
-.faq__items:first-of-type,
-.program-service-block .faq > .faq__items:first-child {
+.program-service-block .faq > .faq__items:first-child,
+.faq__items:first-of-type {
   border-top: none;
-  margin-top: 6px;
-  padding-top: 6px;
+  margin-top: 5px;
+  padding-top: 5px;
 }
 
 .faq__item-accordion {
@@ -362,7 +377,8 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 0 10px;
+  margin: 0;
+  padding: 6px 0 8px;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -374,17 +390,28 @@ a:hover {
   background: rgba(0, 166, 201, 0.04);
 }
 
-/* About Grief uses Capriola + #317d73 for .h3 — LMC: MetaPro + link teal */
+/* About Grief: .program-service .h3 — 25px Capriola #317d73 */
 .faq__item-accordion .h3 {
-  margin: 0;
-  font: 400 24px/1.25 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: var(--lmc-link);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 5px 0;
+  padding: 0;
+  font: 400 25px/1.2 var(--font-display);
+  color: var(--ag-heading);
+  cursor: pointer;
 }
 
-.faq__item-accordion .faq__item-icon {
-  color: var(--lmc-link);
+.faq__item-accordion .faq__item-icon,
+#results-container .faq__item-icon .fas {
   flex-shrink: 0;
   font-size: 15px;
+  color: #0557b4;
+}
+
+#results-container .faq__item-icon.-active .fas {
+  color: #0557b4;
 }
 
 .faq__item-accordion + .faq__items-wrapper {
@@ -402,15 +429,19 @@ a:hover {
 }
 
 .faq__items-sub {
-  padding: 6px 0 0;
+  padding-top: 0;
 }
 
-.faq__items-sub h4 {
-  margin: 10px 0 6px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--lmc-text-muted);
-  text-transform: none;
+.faq__item-accordion + .faq__items-sub {
+  padding-top: 0;
+}
+
+#results-container .faq__items-sub h4,
+#results-container .program-service-block h4 {
+  margin: 0 0 10px;
+  font: 700 19px/1.3 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-text);
+  text-transform: uppercase;
 }
 
 .faq__item {
@@ -423,13 +454,17 @@ a:hover {
   border-bottom: 1px solid var(--lmc-divider-soft);
 }
 
-/* Listing row title: About Grief .faq__item-title blue → LMC link */
+/* About Grief .faq__item-title: 20px / 600 / #0557b4 */
 .faq__item-title,
-.program-service .faq__item-title {
-  color: var(--lmc-link);
-  font-size: 18px;
-  font-weight: 600;
-  padding: 2px 0;
+.program-service__lists .faq__item-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100% - 30px);
+  padding: 2px 15px;
+  font: 600 20px/1.3 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #0557b4;
+  cursor: pointer;
 }
 
 .faq__item-block {
@@ -448,9 +483,10 @@ a:hover {
 
 .faq__item-info {
   display: none;
-  padding: 12px 0 16px;
-  font-size: 16px;
+  padding: 15px 0;
+  font-size: 18px;
   line-height: 1.55;
+  color: var(--lmc-text);
   border-top: 1px dashed var(--lmc-divider-soft);
 }
 
@@ -577,6 +613,66 @@ a:hover {
   touch-action: manipulation;
 }
 
+/* About Grief grief-topic responsive type scale */
+@media screen and (max-width: 1300px) {
+  .program-service__title {
+    font-size: 25px;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .program-service__title {
+    font-size: 23px;
+  }
+
+  .faq__item-accordion .h3 {
+    font-size: 20px;
+  }
+
+  .faq__item-title,
+  .program-service__lists .faq__item-title {
+    font-size: 18px;
+  }
+
+  #results-container .faq__items-sub h4,
+  #results-container .program-service-block h4 {
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 860px) {
+  .program-service__title {
+    font-size: 20px;
+  }
+
+  .program-service .form-select,
+  .program-service .form-input {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 840px) {
+  .faq__item-accordion .h3 {
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .program-service__title {
+    font-size: 18px;
+  }
+
+  #results-container .faq__items-sub h4,
+  #results-container .program-service-block h4 {
+    font-size: 17px;
+  }
+
+  .faq__item-title,
+  .program-service__lists .faq__item-title {
+    font-size: 16px;
+  }
+}
+
 @media screen and (max-width: 639px) {
   .lmc-widget-main {
     padding: 8px 12px 24px;
@@ -591,10 +687,12 @@ a:hover {
     min-width: 0;
   }
 
-  .program-service__form .form-select,
-  .program-service__form .form-input {
-    font-size: 16px;
+  .program-service .form-select,
+  .program-service .form-input {
+    max-width: 100%;
+    height: auto;
     min-height: 44px;
+    font-size: 16px;
   }
 
   .form-buttons-container {
@@ -627,17 +725,9 @@ a:hover {
     min-height: 48px;
   }
 
-  .faq__item-accordion .h3 {
-    font-size: 20px;
-  }
-
   .faq__item-block {
     padding: 12px 0;
     min-height: 48px;
-  }
-
-  .program-service__title {
-    font-size: 22px;
   }
 
   #results-container {
