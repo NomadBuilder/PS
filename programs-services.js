@@ -2,8 +2,23 @@
   var API_PAGE = "https://aboutgrief.ca/programs-and-services/";
   var API_CATEGORIES =
     "https://aboutgrief.ca/umbraco/Surface/GriefContent/UpdateCategories";
+  var ABOUT_GRIEF_ORIGIN = "https://aboutgrief.ca";
 
   var manifestPromise = null;
+
+  /**
+   * Listings use root-relative URLs (/Assets/..., /media/...). On LMC or GitHub
+   * Pages those resolve to the wrong host and icons break — point them at About Grief.
+   */
+  function absolutizeAboutGriefMediaInHtml(html) {
+    if (!html || typeof html !== "string") {
+      return html;
+    }
+    return html
+      .replace(/(\b(?:href|src))="\/(?!\/)/g, '$1="' + ABOUT_GRIEF_ORIGIN + "/")
+      .replace(/\baction="\/(?!\/)/g, 'action="' + ABOUT_GRIEF_ORIGIN + "/")
+      .replace(/url\(\/(?!\/)/g, "url(" + ABOUT_GRIEF_ORIGIN + "/");
+  }
 
   function getProgramsDataBase() {
     var w = window.LMC_PROGRAMS_DATA_BASE;
@@ -161,7 +176,9 @@
           });
         })
         .then(function (text) {
-          var html = applyResultsFragmentText(text);
+          var html = absolutizeAboutGriefMediaInHtml(
+            applyResultsFragmentText(text)
+          );
           $("#results-container").html(html);
           enhanceNationalDefaultView();
         })
@@ -190,7 +207,9 @@
           );
           return;
         }
-        $("#results-container").html(fragment);
+        $("#results-container").html(
+          absolutizeAboutGriefMediaInHtml(fragment)
+        );
         enhanceNationalDefaultView();
       },
       error: function (xhr) {

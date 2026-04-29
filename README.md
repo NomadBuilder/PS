@@ -17,6 +17,7 @@ About Grief sends **`X-Frame-Options: SAMEORIGIN`**, so you **cannot** embed the
 3. **Content-Security-Policy** on LMC must allow at least:
    - `script-src` / `connect-src`: `https://nomadbuilder.github.io`, `https://code.jquery.com`, `https://aboutgrief.ca`
    - `style-src`: `https://nomadbuilder.github.io`, `https://pro.fontawesome.com`, `https://aboutgrief.ca` (chrome pulls their CSS into shadow roots)
+   - `img-src`: include **`https://aboutgrief.ca`** (listing icons and photos use their `/Assets/` and `/media/` URLs after the widget rewrites paths)
    - `font-src`: `https://pro.fontawesome.com`, `https://aboutgrief.ca` as needed
 
 Do not inject the tag twice (duplicate `#map-root` / `#results-container` IDs).
