@@ -141,7 +141,7 @@ a:hover {
 .lmc-map-card .canada-map {
   display: block;
   width: 100%;
-  max-width: 720px;
+  max-width: none;
   height: auto;
   margin: 0 auto;
 }
@@ -828,8 +828,3 @@ a:hover {
   }
 }
 
-@media screen and (max-width: 380px) {
-  .lmc-map-card .canada-map {
-    max-width: 100%;
-  }
-}
