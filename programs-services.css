@@ -1,16 +1,28 @@
-/* Living My Culture–inspired skin for Programs & Services (About Grief data) */
-
+/*
+ * Living My Culture skin — tokens aligned to live site CSS
+ * (https://livingmyculture.ca/culture/ — style.css + styles chunk: MetaPro,
+ * culture teal #00a6c9 / #00bbce, links #018391, people green #54a437, etc.)
+ */
 :root {
   --lmc-text: #215352;
-  --lmc-text-muted: #3d6b69;
+  --lmc-text-muted: #527883;
   --lmc-link: #018391;
-  --lmc-link-hover: #015a63;
+  --lmc-link-hover: #106476;
+  /* Culture tab / primary actions */
+  --lmc-culture: #00a6c9;
+  --lmc-culture-bright: #00bbce;
   --lmc-accent: #009dbd;
-  --lmc-accent-dark: #007a96;
-  --lmc-soft: #e8f6f4;
+  --lmc-accent-dark: #0096b5;
+  --lmc-intro: #00a7c9;
+  --lmc-topic: #6c2373;
+  --lmc-people: #54a437;
+  --lmc-people-hover: #5cb83b;
+  --lmc-soft: #e4f9ff;
+  --lmc-soft-warm: #f6f4f4;
   --lmc-highlight: #a7e36c;
   --lmc-navy: #27326b;
-  --lmc-border: #c5ddd9;
+  --lmc-border: #dcdcdc;
+  --lmc-border-strong: #c5ddd9;
   --lmc-white: #fff;
   --lmc-max: 1100px;
 }
@@ -83,7 +95,7 @@ a:hover {
   z-index: 1000;
   padding: 0.5rem 1rem;
   background: var(--lmc-white);
-  border: 2px solid var(--lmc-accent);
+  border: 2px solid var(--lmc-culture);
 }
 
 /* Embed / iframe: no site chrome; parent page supplies header & footer */
@@ -111,8 +123,8 @@ a:hover {
 }
 
 .lmc-map-card {
-  background: var(--lmc-soft);
-  border: 1px solid var(--lmc-border);
+  background: linear-gradient(180deg, #f6fcfd 0%, var(--lmc-soft) 100%);
+  border: 1px solid var(--lmc-border-strong);
   border-radius: 8px;
   padding: 16px;
   overflow: hidden;
@@ -138,14 +150,14 @@ a:hover {
 .lmc-map-card .canada-map .st4,
 .lmc-map-card .canada-map .st5,
 .lmc-map-card .canada-map .st6 {
-  fill: #b8dfd9;
+  fill: #d7f1f7;
   stroke: #215352;
   stroke-width: 0.35;
 }
 
 .lmc-map-card .canada-map .map-location:hover,
 .lmc-map-card .canada-map .map-location:focus {
-  fill: var(--lmc-accent);
+  fill: var(--lmc-culture-bright);
   stroke: var(--lmc-navy);
 }
 
@@ -159,7 +171,8 @@ a:hover {
   margin: 12px 0 0;
   text-align: center;
   font-size: 14px;
-  color: var(--lmc-text-muted);
+  color: var(--lmc-intro);
+  font-style: italic;
 }
 
 /* —— Program service block (server class names preserved) —— */
@@ -169,10 +182,10 @@ a:hover {
 
 #program-service h2.h2,
 .program-service h2.h2 {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--lmc-navy);
   margin: 0 0 16px;
+  padding: 0;
+  font: 400 24px/30px MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-link);
 }
 
 .program-service__form {
@@ -181,7 +194,7 @@ a:hover {
   border-radius: 8px;
   padding: 20px 20px 8px;
   margin-bottom: 28px;
-  box-shadow: 0 2px 8px rgba(33, 83, 82, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 96, 100, 0.08);
 }
 
 .program-service__form .form-block {
@@ -217,9 +230,9 @@ a:hover {
 
 .program-service__form .form-select:focus,
 .program-service__form .form-input:focus {
-  outline: 2px solid var(--lmc-accent);
+  outline: 2px solid var(--lmc-culture);
   outline-offset: 1px;
-  border-color: var(--lmc-accent);
+  border-color: var(--lmc-culture);
 }
 
 .form-buttons-container {
@@ -235,18 +248,18 @@ a:hover {
   align-items: center;
   gap: 8px;
   padding: 12px 22px;
-  font: inherit;
-  font-weight: 600;
+  font: 600 15px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--lmc-white);
-  background: var(--lmc-accent);
+  background: linear-gradient(180deg, var(--lmc-culture-bright) 0%, var(--lmc-accent) 100%);
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: filter 0.15s ease, background 0.15s ease;
 }
 
 .form-submit:hover {
   background: var(--lmc-accent-dark);
+  filter: brightness(0.98);
 }
 
 .program-reset {
@@ -261,8 +274,8 @@ a:hover {
 }
 
 .program-reset:hover {
-  border-color: var(--lmc-text-muted);
-  background: var(--lmc-soft);
+  border-color: var(--lmc-culture);
+  background: var(--lmc-soft-warm);
 }
 
 /* —— Results —— */
@@ -276,13 +289,25 @@ a:hover {
 
 .program-service__lists .mb-20 {
   margin-bottom: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.program-service__lists .mb-20 i {
+  color: var(--lmc-intro);
+  font-style: italic;
+}
+
+.program-service__lists .click-text.display-default-all-sites,
+.program-service__lists .click-text.display-grief {
+  color: var(--lmc-intro);
 }
 
 .program-service__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--lmc-navy);
   margin: 28px 0 12px;
+  padding: 0;
+  font: 700 18px/24px MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-text);
 }
 
 .program-service__title:first-child {
@@ -334,7 +359,7 @@ a:hover {
 }
 
 .faq__item-accordion .faq__item-icon {
-  color: var(--lmc-accent);
+  color: var(--lmc-culture);
   flex-shrink: 0;
 }
 
@@ -346,6 +371,10 @@ a:hover {
 
 .faq__item-accordion.-active + .faq__items-wrapper {
   display: block;
+}
+
+.faq__item-accordion.-active {
+  box-shadow: inset 3px 0 0 0 var(--lmc-culture-bright);
 }
 
 .faq__items-sub {
@@ -438,8 +467,7 @@ a:hover {
   display: inline-block;
   margin-top: 16px;
   padding: 10px 18px;
-  font: inherit;
-  font-weight: 600;
+  font: 600 15px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--lmc-white);
   background: var(--lmc-navy);
   border: none;
@@ -448,7 +476,7 @@ a:hover {
 }
 
 #pagination_button:hover {
-  opacity: 0.92;
+  background: #315a85;
 }
 
 /* Footer actions */
@@ -479,14 +507,14 @@ a:hover {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  font-weight: 600;
-  color: var(--lmc-navy);
-  background: var(--lmc-highlight);
+  font: 600 15px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-white);
+  background: var(--lmc-people);
   border-radius: 6px;
 }
 
 .btn-more:hover {
-  filter: brightness(0.97);
+  background: var(--lmc-people-hover);
   text-decoration: none;
 }
 
