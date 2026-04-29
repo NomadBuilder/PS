@@ -14,9 +14,9 @@
 ## GTM on LMC
 
 1. New **Custom HTML** tag → paste contents of **`gtm-custom-html.html`** (remove the jQuery `appendScript` block if the page already provides jQuery 3.x and call `loadPrograms()` after your jQuery is ready, or keep as-is).
-2. **Trigger (recommended):** **DOM Ready** with a URL rule so the tag only runs when you want the programs view, for example:
-   - **Page Path** equals `/culture/` or **Page URL** contains `livingmyculture.ca/culture`, **and**
-   - **Page URL** matches RegEx so both `programs` and `services` appear in the query (e.g. `?programs&services`).
+2. **Trigger:** **DOM Ready** → *Some DOM Ready Events* → **two AND conditions** (no hostname needed if this GTM container is **only** on Living My Culture):
+   - **Page Path** | matches RegEx | `^/culture/?$` — culture **landing** only (`/culture` or `/culture/`), not `/culture/first-nations/` etc.
+   - **Page URL** | matches RegEx | `[?&]programs(?:=|&|$).*[?&]services(?:=|&|$)|[?&]services(?:=|&|$).*[?&]programs(?:=|&|$)` — query must include both `programs` and `services` (e.g. `?programs&services`).
 3. The script **clears `div.center` and injects** the map + search + results. Anything that was inside `.center` (intro, culture grid, partners block in that column) is removed for that page view—plan the trigger so that only happens on the intended URLs.
 4. **Content-Security-Policy** on LMC must allow at least:
    - `script-src` / `connect-src`: `https://nomadbuilder.github.io`, `https://code.jquery.com`, `https://aboutgrief.ca`
