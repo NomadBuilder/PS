@@ -207,17 +207,33 @@ a:hover {
 }
 
 /*
- * About Grief uses ~220px-wide controls inside a full-width coloured band, so
- * their CSS caps .form-input. On LMC/embed the page is full width — keeping
- * 220px max-width made the whole form a thin strip. Use a responsive grid so
- * fields grow like AG’s wide layout without the AG background wrapper.
+ * Single .form-block with all fields (merged from AG’s three rows).
+ * Wide: one row × 5 cols. Medium: two rows max (3 + 2). Narrow: one column.
  */
 .program-service__form .form-block {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-  gap: 16px 24px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin-bottom: 12px;
   width: 100%;
+}
+
+@media screen and (max-width: 1024px) {
+  .program-service__form .form-block {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .program-service__form .form-block {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .program-service__form .form-block {
+    grid-template-columns: 1fr;
+  }
 }
 
 .program-service__form .form-block__item {

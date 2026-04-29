@@ -40,6 +40,54 @@ def extract_results_inner(html: str) -> str:
     return inner
 
 
+def merge_search_form_blocks(html: str) -> str:
+    """
+    About Grief returns several .form-block rows; merge into one so CSS can
+    lay out 5 fields in one row (or two rows max on tablet).
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    form = soup.find("form", id="programs-services-form")
+    if not form:
+        return html
+
+    items = []
+    remove_blocks = []
+    for child in form.find_all("div", recursive=False):
+        classes = child.get("class") or []
+        if "form-buttons-container" in classes:
+            continue
+        if "form-block" not in classes:
+            continue
+        for sub in list(child.children):
+            if not getattr(sub, "name", None) == "div":
+                continue
+            subcls = sub.get("class") or []
+            if "form-block__item" in subcls:
+                items.append(sub.extract())
+        remove_blocks.append(child)
+
+    if len(remove_blocks) < 2:
+        return html
+
+    for el in remove_blocks:
+        el.decompose()
+
+    new_block = soup.new_tag("div", attrs={"class": "form-block"})
+    for it in items:
+        new_block.append(it)
+
+    btn = form.find(
+        "div",
+        class_=lambda c: bool(c) and "form-buttons-container" in (c if isinstance(c, list) else [c]),
+    )
+    if btn:
+        btn.insert_before(new_block)
+    else:
+        form.append(new_block)
+
+    return str(soup)
+
+
 def main() -> int:
     if not MANIFEST.exists():
         print("Missing programs-manifest.json at", MANIFEST, file=sys.stderr)
@@ -63,8 +111,9 @@ def main() -> int:
         timeout=120,
     )
     r.raise_for_status()
-    (ROOT / "search-form.html").write_text(r.text, encoding="utf-8")
-    print("  wrote search-form.html", len(r.text), "bytes")
+    merged = merge_search_form_blocks(r.text)
+    (ROOT / "search-form.html").write_text(merged, encoding="utf-8")
+    print("  wrote search-form.html", len(merged), "bytes (merged form-block)")
 
     for loc_key, rel_path in sorted(fragments.items(), key=lambda x: x[1]):
         out = ROOT / rel_path
