@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "searchForm": "search-form.html",
+  "fragments": {
+    "": "fragments/national.html",
+    "Alberta": "fragments/alberta.html",
+    "British Columbia": "fragments/british-columbia.html",
+    "Manitoba": "fragments/manitoba.html",
+    "New Brunswick": "fragments/new-brunswick.html",
+    "Newfoundland and Labrador": "fragments/newfoundland-and-labrador.html",
+    "Northwest Territories": "fragments/northwest-territories.html",
+    "Nova Scotia": "fragments/nova-scotia.html",
+    "Nunavut": "fragments/nunavut.html",
+    "Ontario": "fragments/ontario.html",
+    "Prince Edward Island": "fragments/prince-edward-island.html",
+    "Quebec": "fragments/quebec.html",
+    "Saskatchewan": "fragments/saskatchewan.html",
+    "Yukon": "fragments/yukon.html"
+  }
+}

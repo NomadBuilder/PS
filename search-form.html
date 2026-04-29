@@ -1,0 +1,54 @@
+<div class="lmc-static-search-placeholder">
+  <p><strong>Replace this file</strong> with the HTML returned by About Grief’s <code>UpdateCategories</code> GET (same markup as inside <code>#search-container</code> on a live load). The widget expects these IDs: <code>#program-location</code>, <code>#program-category</code>, <code>#program-subcategory</code>, <code>#program-radius</code>, <code>#postalCode</code>, <code>#submit</code>, <code>#reset</code>.</p>
+</div>
+<form class="program-service__form" action="#" method="get">
+  <div class="program-service__form-row">
+    <label for="program-location">Province/Territory</label>
+    <select id="program-location" name="location">
+      <option value="">Canada (National)</option>
+      <option value="Alberta">Alberta</option>
+      <option value="British Columbia">British Columbia</option>
+      <option value="Manitoba">Manitoba</option>
+      <option value="New Brunswick">New Brunswick</option>
+      <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+      <option value="Northwest Territories">Northwest Territories</option>
+      <option value="Nova Scotia">Nova Scotia</option>
+      <option value="Nunavut">Nunavut</option>
+      <option value="Ontario">Ontario</option>
+      <option value="Prince Edward Island">Prince Edward Island</option>
+      <option value="Quebec">Quebec</option>
+      <option value="Saskatchewan">Saskatchewan</option>
+      <option value="Yukon">Yukon</option>
+    </select>
+  </div>
+  <div class="program-service__form-row">
+    <label for="program-category">Category</label>
+    <select id="program-category" name="category">
+      <option value="">All categories</option>
+    </select>
+  </div>
+  <div class="program-service__form-row">
+    <label for="program-subcategory">Subcategory</label>
+    <select id="program-subcategory" name="subcategory">
+      <option value="">All subcategories</option>
+    </select>
+  </div>
+  <div class="program-service__form-row">
+    <label for="postalCode">Postal code</label>
+    <input type="text" id="postalCode" name="postalCode" placeholder="Postal code" maxlength="10" autocomplete="postal-code" />
+  </div>
+  <div class="program-service__form-row">
+    <label for="program-radius">Distance</label>
+    <select id="program-radius" name="radius">
+      <option value="0">Full Prov/Terr</option>
+      <option value="10">10 km</option>
+      <option value="25">25 km</option>
+      <option value="50">50 km</option>
+      <option value="100">100 km</option>
+    </select>
+  </div>
+  <div class="program-service__form-actions">
+    <button type="button" id="submit" class="btn">Search</button>
+    <button type="button" id="reset" class="btn btn--secondary">Reset</button>
+  </div>
+</form>
