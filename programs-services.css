@@ -143,29 +143,79 @@ a:hover {
 
 .lmc-map-card .canada-map .map-location {
   cursor: pointer;
-  transition: fill 0.12s ease;
 }
 
-.lmc-map-card .canada-map .st0,
-.lmc-map-card .canada-map .st1,
-.lmc-map-card .canada-map .st2,
-.lmc-map-card .canada-map .st3,
-.lmc-map-card .canada-map .st4,
-.lmc-map-card .canada-map .st5,
+/* Province fills match About Grief (grief-topic map SVG classes). */
+.lmc-map-card .canada-map path.map-location {
+  transition: fill 0.3s ease;
+}
+
+.lmc-map-card .canada-map .st0 {
+  clip-path: url(#SVGID_2_);
+  fill: #86a97d;
+}
+
+.lmc-map-card .canada-map .st1 {
+  clip-path: url(#SVGID_2_);
+  fill: #c38cba;
+}
+
+.lmc-map-card .canada-map .st2 {
+  clip-path: url(#SVGID_2_);
+  fill: #61a3be;
+}
+
+.lmc-map-card .canada-map .st3 {
+  clip-path: url(#SVGID_2_);
+  fill: #9c81b7;
+}
+
+.lmc-map-card .canada-map .st4 {
+  clip-path: url(#SVGID_2_);
+  fill: #b4d670;
+}
+
+.lmc-map-card .canada-map .st5 {
+  clip-path: url(#SVGID_2_);
+  fill: #8ccde2;
+}
+
 .lmc-map-card .canada-map .st6 {
-  fill: #e8f4f2;
-  stroke: #215352;
-  stroke-width: 0.35;
+  clip-path: url(#SVGID_2_);
+  fill: #b1d89b;
 }
 
-.lmc-map-card .canada-map .map-location:hover,
-.lmc-map-card .canada-map .map-location:focus {
-  fill: #c5ebe8;
-  stroke: var(--lmc-navy);
+.lmc-map-card .canada-map path.map-location:hover,
+.lmc-map-card .canada-map path.map-location:focus {
+  fill: #2e9e2e;
+}
+
+.lmc-map-card .canada-map path.map-location.active,
+.lmc-map-card .canada-map path.map-location.active:hover {
+  fill: #2e2e9e !important;
+}
+
+.lmc-map-card .canada-map .st7 {
+  font-weight: 700;
+  font-size: 10px;
+}
+
+.lmc-map-card .canada-map .st8 {
+  font-size: 10px;
+}
+
+.lmc-map-card .canada-map .st9 {
+  font-size: 10.3744px;
+}
+
+.lmc-map-card .canada-map .st10 {
+  fill: none;
+  stroke: #000;
+  stroke-miterlimit: 10;
 }
 
 .lmc-map-card .canada-map text {
-  fill: var(--lmc-text);
+  fill: #000;
   pointer-events: none;
   font-family: MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
