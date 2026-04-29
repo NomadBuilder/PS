@@ -21,10 +21,8 @@
   --lmc-white: #fff;
   --lmc-max: 1100px;
   --font-display: Capriola, MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --lmc-programs-hero-title: rgb(108, 35, 115);
+  --lmc-programs-hero-title: #ce5b48;
   --lmc-programs-hero-lead: #215352;
-  /* National / International + category row titles (Advocacy, Support Groups, …) */
-  --lmc-programs-section-heading: #0557b4;
 }
 
 *,
@@ -450,7 +448,7 @@ a:hover {
   margin: 1.5rem 0 12px;
   padding: 8px 0 0;
   font: 400 30px/1.2 var(--font-display);
-  color: var(--lmc-programs-section-heading);
+  color: var(--ag-heading);
 }
 
 .program-service__text-block {
@@ -513,7 +511,7 @@ a:hover {
   margin: 6px 0 4px;
   padding: 0;
   font: 400 25px/1.2 var(--font-display);
-  color: var(--lmc-programs-section-heading);
+  color: var(--ag-heading);
   cursor: pointer;
 }
 
