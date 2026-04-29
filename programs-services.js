@@ -210,6 +210,14 @@
     if (d.page != null && String(d.page).trim() !== "") {
       o.page = String(d.page).trim();
     }
+    /**
+     * About Grief POST returns an empty #results-container when "Who is it for" (subcategory)
+     * is set but national location is "". The form uses value="" for Canada; POST needs
+     * location=Canada to render national audience-filtered HTML (curl-verified vs ?location=).
+     */
+    if ($.trim(o.subcategory) !== "" && $.trim(o.location) === "") {
+      o.location = "Canada";
+    }
     return o;
   }
 
