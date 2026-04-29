@@ -2,6 +2,7 @@
   (function () {
     var BASE = "https://nomadbuilder.github.io/PS/";
     var CSS_VER = "6";
+    var JS_VER = "7";
     window.LMC_PROGRAMS_DATA_BASE = BASE;
 
     function findProgramsMountRoot() {
@@ -123,7 +124,7 @@
     function loadPrograms() {
       if (document.querySelector("script[data-lmc-programs-map]")) return;
       var s = document.createElement("script");
-      s.src = BASE + "programs-services.js";
+      s.src = BASE + "programs-services.js?v=" + JS_VER;
       s.setAttribute("data-lmc-programs-map", BASE + "canada-map.svg");
       s.defer = true;
       s.onerror = function () {

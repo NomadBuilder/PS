@@ -5,6 +5,7 @@
   var ABOUT_GRIEF_ORIGIN = "https://aboutgrief.ca";
 
   var manifestPromise = null;
+  var liveFormRefreshTimer = null;
 
   /**
    * Listings use root-relative URLs (/Assets/..., /media/...). On LMC or GitHub
@@ -37,6 +38,34 @@
 
   function isStaticMode() {
     return getProgramsDataBase() !== null;
+  }
+
+  /**
+   * Static fragments are keyed by location only (see programs-manifest.json).
+   * Subcategory / category / postal / radius filters must use the live About Grief
+   * POST endpoint or filtered searches (e.g. Indigenous) show the wrong cached HTML.
+   */
+  function hasActiveResultFilters(data) {
+    if (!data || typeof data !== "object") {
+      return false;
+    }
+    var sub = (data.subcategory && String(data.subcategory).trim()) || "";
+    var cat = (data.category && String(data.category).trim()) || "";
+    var pc = (data.postalCode && String(data.postalCode).trim()) || "";
+    if (sub || cat || pc) {
+      return true;
+    }
+    var r =
+      data.radius !== undefined && data.radius !== null
+        ? String(data.radius).trim()
+        : "";
+    if (r && r !== "0") {
+      return true;
+    }
+    if (data.page !== undefined && data.page !== null && String(data.page).trim() !== "") {
+      return true;
+    }
+    return false;
   }
 
   function loadManifest() {
@@ -129,6 +158,137 @@
     };
   }
 
+  /** Postal field id/name varies slightly across exports; resolve one jQuery collection. */
+  function postalInput$() {
+    return $(
+      "#search-container input#postalCode, #search-container #postalCode, #search-container input[name='postalCode'], input#postalCode, #postalCode"
+    )
+      .filter("input")
+      .first();
+  }
+
+  function programsUrlParams() {
+    try {
+      return new URLSearchParams(window.location.search || "");
+    } catch (e) {
+      return new URLSearchParams();
+    }
+  }
+
+  /** Set <select> only if an option matches (avoids silent clears on typos in URL). */
+  function setSelectValueIfAllowed($select, raw) {
+    if (!$select.length) {
+      return;
+    }
+    var v = raw == null ? "" : String(raw);
+    var has = $select.find("option").filter(function () {
+      var $o = $(this);
+      var ov = $o.attr("value");
+      if (ov === undefined) {
+        return ($o.val() || "") === v;
+      }
+      return ov === v;
+    }).length;
+    if (has) {
+      $select.val(v);
+    }
+  }
+
+  /** Coerce POST body to strings the Umbraco surface expects; drop stray undefined. */
+  function normalizeProgramsPayload(data) {
+    var d = data && typeof data === "object" ? data : {};
+    var o = {
+      location: d.location != null ? String(d.location) : "",
+      category: d.category != null ? String(d.category) : "",
+      subcategory: d.subcategory != null ? String(d.subcategory) : "",
+      radius:
+        d.radius != null && String(d.radius).trim() !== ""
+          ? String(d.radius)
+          : "0",
+      postalCode: d.postalCode != null ? String(d.postalCode) : "",
+    };
+    if (d.page != null && String(d.page).trim() !== "") {
+      o.page = String(d.page).trim();
+    }
+    return o;
+  }
+
+  /**
+   * Apply ?location=&category=&… to the form.
+   * @param {boolean} applyDefaultsForAbsentKeys — if true (e.g. browser back/forward), reset fields whose keys are missing from the URL.
+   */
+  function syncProgramsFormFromUrl(applyDefaultsForAbsentKeys) {
+    applyDefaultsForAbsentKeys = !!applyDefaultsForAbsentKeys;
+    if (!window.location.search) {
+      if (applyDefaultsForAbsentKeys) {
+        $("#program-location").val("");
+        $("#program-category").val("");
+        $("#program-subcategory").val("");
+        $("#program-radius").val("0");
+        postalInput$().val("");
+      }
+      return;
+    }
+    var p = programsUrlParams();
+    if (!hasProgramsSearchParamsInUrl()) {
+      if (applyDefaultsForAbsentKeys) {
+        $("#program-location").val("");
+        $("#program-category").val("");
+        $("#program-subcategory").val("");
+        $("#program-radius").val("0");
+        postalInput$().val("");
+      }
+      return;
+    }
+    if (p.has("location")) {
+      setSelectValueIfAllowed($("#program-location"), p.get("location") || "");
+    } else if (applyDefaultsForAbsentKeys) {
+      $("#program-location").val("");
+    }
+    if (p.has("category")) {
+      setSelectValueIfAllowed($("#program-category"), p.get("category") || "");
+    } else if (applyDefaultsForAbsentKeys) {
+      $("#program-category").val("");
+    }
+    if (p.has("subcategory")) {
+      setSelectValueIfAllowed(
+        $("#program-subcategory"),
+        p.get("subcategory") || ""
+      );
+    } else if (applyDefaultsForAbsentKeys) {
+      $("#program-subcategory").val("");
+    }
+    if (p.has("radius")) {
+      setSelectValueIfAllowed($("#program-radius"), p.get("radius") || "0");
+    } else if (applyDefaultsForAbsentKeys) {
+      $("#program-radius").val("0");
+    }
+    if (p.has("postalCode")) {
+      postalInput$().val(p.get("postalCode") || "");
+    } else if (applyDefaultsForAbsentKeys) {
+      postalInput$().val("");
+    }
+  }
+
+  function resultsPayloadFromForm() {
+    var o = {
+      location: $("#program-location").val() || "",
+      category: $("#program-category").val() || "",
+      subcategory: $("#program-subcategory").val() || "",
+      radius: $("#program-radius").val() || "0",
+      postalCode: (postalInput$().val() || "").trim(),
+    };
+    var p = programsUrlParams();
+    if (p.has("page") && p.get("page")) {
+      o.page = p.get("page");
+    }
+    return normalizeProgramsPayload(o);
+  }
+
+  function escapeForUrlQueryKey(key) {
+    return String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
   function updateQueryString(key, value) {
     var baseUrl = [
       location.protocol,
@@ -141,7 +301,9 @@
     var params = "?" + newParam;
 
     if (urlQueryString) {
-      var keyRegex = new RegExp("([?&])" + key + "[^&]*");
+      var keyRegex = new RegExp(
+        "([?&])" + escapeForUrlQueryKey(key) + "=[^&]*"
+      );
       if (urlQueryString.match(keyRegex) !== null) {
         params = urlQueryString.replace(keyRegex, "$1" + newParam);
       } else {
@@ -151,14 +313,31 @@
     window.history.replaceState({}, "", baseUrl + params);
   }
 
+  function removeQueryStringKey(key) {
+    var baseUrl = [
+      location.protocol,
+      "//",
+      location.host,
+      location.pathname,
+    ].join("");
+    var p = programsUrlParams();
+    p.delete(key);
+    var next = p.toString();
+    window.history.replaceState({}, "", baseUrl + (next ? "?" + next : ""));
+  }
+
   window.refreshResults = function (data, scrollToResults) {
     scrollToResults = !!scrollToResults;
+    data = normalizeProgramsPayload(data);
 
     $("#results-container").html(
       '<p class="lmc-loading" role="status">Loading programs…</p>'
     );
 
-    if (isStaticMode()) {
+    var useStaticFragment =
+      isStaticMode() && !hasActiveResultFilters(data);
+
+    if (useStaticFragment) {
       var base = getProgramsDataBase();
       var loc = typeof data.location === "string" ? data.location : "";
       loadManifest()
@@ -258,13 +437,13 @@
       if (typeof data.postalCode !== "undefined") {
         next.postalCode = data.postalCode;
       } else {
-        next.postalCode = $("input#postalCode").val() || "";
+        next.postalCode = (postalInput$().val() || "").trim();
       }
 
       updateQueryString("category", category || "");
       updateQueryString("subcategory", subcategory || "");
 
-      refreshResults(next, true);
+      refreshResults(normalizeProgramsPayload(next), true);
       return;
     }
 
@@ -292,13 +471,13 @@
         if (typeof data.postalCode !== "undefined") {
           next.postalCode = data.postalCode;
         } else {
-          next.postalCode = $("input#postalCode").val() || "";
+          next.postalCode = (postalInput$().val() || "").trim();
         }
 
         updateQueryString("category", category || "");
         updateQueryString("subcategory", subcategory || "");
 
-        refreshResults(next, true);
+        refreshResults(normalizeProgramsPayload(next), true);
       },
       error: function () {
         $("#search-container").html(
@@ -352,16 +531,49 @@
   }
 
   function setProvinceFromPostalCode() {
-    var postalCode = $("#postalCode").val().trim();
+    var $in = postalInput$();
+    if (!$in.length) {
+      return;
+    }
+    var postalCode = ($in.val() || "").trim();
     var province = getProvinceByPostalCode(postalCode);
     if (province) {
-      $("#program-location").val(province);
+      setSelectValueIfAllowed($("#program-location"), province);
     }
   }
 
+  /**
+   * If the URL already carries programs filters (e.g. subcategory=Indigenous&location=),
+   * do not infer postal/location from IP — that would overwrite national "Canada" and break
+   * audience-only searches after syncProgramsFormFromUrl().
+   */
+  function hasProgramsSearchParamsInUrl() {
+    if (!window.location.search) {
+      return false;
+    }
+    var keys = [
+      "location",
+      "category",
+      "subcategory",
+      "postalCode",
+      "radius",
+      "page",
+    ];
+    var p = programsUrlParams();
+    for (var i = 0; i < keys.length; i++) {
+      if (p.has(keys[i])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   function tryAutofillPostalFromIp() {
-    var postalCodeInput = $("input#postalCode");
-    if (!postalCodeInput.length || postalCodeInput.val() !== "") {
+    if (hasProgramsSearchParamsInUrl()) {
+      return;
+    }
+    var postalCodeInput = postalInput$();
+    if (!postalCodeInput.length || (postalCodeInput.val() || "").trim() !== "") {
       return;
     }
 
@@ -397,6 +609,7 @@
 
       $("#program-location").val(selectedLocation);
       updateQueryString("location", selectedLocation || "");
+      updateQueryString("category", selectedCategory || "");
       updateQueryString("subcategory", selectedSubcategory || "");
 
       refreshCategories({
@@ -414,32 +627,22 @@
 
     $(document).on("click", "#submit", function (e) {
       e.preventDefault();
-      var location = $("#program-location").val() || "";
-      var category = $("#program-category").val() || "";
-      var subcategory = $("#program-subcategory").val() || "";
-      var radius = $("#program-radius").val() || "0";
-      var postalCode = $("input#postalCode").val() || "";
+      var payload = resultsPayloadFromForm();
+      delete payload.page;
 
-      updateQueryString("location", location);
-      updateQueryString("category", category);
-      updateQueryString("subcategory", subcategory);
-      updateQueryString("radius", radius);
-      updateQueryString("postalCode", postalCode);
+      updateQueryString("location", payload.location);
+      updateQueryString("category", payload.category);
+      updateQueryString("subcategory", payload.subcategory);
+      updateQueryString("radius", payload.radius);
+      updateQueryString("postalCode", payload.postalCode);
+      removeQueryStringKey("page");
 
-      refreshResults(
-        {
-          location: location,
-          category: category,
-          subcategory: subcategory,
-          radius: radius,
-          postalCode: postalCode,
-        },
-        true
-      );
+      refreshResults(payload, true);
     });
 
     $(document).on("click", "#reset", function (e) {
       e.preventDefault();
+      removeQueryStringKey("page");
       updateQueryString("location", "");
       updateQueryString("category", "");
       updateQueryString("subcategory", "");
@@ -450,30 +653,62 @@
       $("#program-category").val("");
       $("#program-subcategory").val("");
       $("#program-radius").val("0");
-      $("input#postalCode").val("");
+      postalInput$().val("");
       refreshResults(nationalSearchPayload(), true);
     });
 
-    $(document).on("change blur", "#postalCode", function () {
-      setProvinceFromPostalCode();
-    });
+    $(document).on(
+      "change blur",
+      "#search-container #postalCode, #search-container input[name='postalCode'], input#postalCode, #postalCode",
+      function () {
+        setProvinceFromPostalCode();
+      }
+    );
 
     $(document).on("click", "#pagination_button", function (e) {
       e.preventDefault();
       var page = $(this).attr("data-page");
       updateQueryString("page", page || "");
-      refreshResults(
-        {
-          page: page,
-          location: $("#program-location").val() || "",
-          category: $("#program-category").val() || "",
-          subcategory: $("#program-subcategory").val() || "",
-          radius: $("#program-radius").val() || "0",
-          postalCode: $("input#postalCode").val() || "",
-        },
-        true
-      );
+      refreshResults(resultsPayloadFromForm(), true);
     });
+
+    $(document).on(
+      "change",
+      "#search-container #program-subcategory, #search-container #program-category, #search-container #program-location",
+      function () {
+        if (isStaticMode()) {
+          return;
+        }
+        clearTimeout(liveFormRefreshTimer);
+        liveFormRefreshTimer = setTimeout(function () {
+          if (!$("#program-location").length) {
+            return;
+          }
+          var location = $("#program-location").val() || "";
+          var category = $("#program-category").val() || "";
+          var subcategory = $("#program-subcategory").val() || "";
+          updateQueryString("location", location);
+          updateQueryString("category", category);
+          updateQueryString("subcategory", subcategory);
+          $.ajax({
+            type: "GET",
+            url: API_CATEGORIES,
+            data: {
+              location: location,
+              category: category,
+              subcategory: subcategory,
+              lang: "en-US",
+            },
+            success: function (result) {
+              $("#search-container").html(result);
+              setSelectValueIfAllowed($("#program-location"), location);
+              setSelectValueIfAllowed($("#program-category"), category);
+              setSelectValueIfAllowed($("#program-subcategory"), subcategory);
+            },
+          });
+        }, 280);
+      }
+    );
 
     $(document).on(
       "click",
@@ -548,8 +783,9 @@
         })
         .then(function (html) {
           $("#search-container").html(html);
+          syncProgramsFormFromUrl();
           tryAutofillPostalFromIp();
-          refreshResults(nationalSearchPayload());
+          refreshResults(resultsPayloadFromForm(), false);
         })
         .catch(function () {
           $("#search-container").html(
@@ -559,18 +795,34 @@
       return;
     }
 
+    var initCat = {
+      location: "",
+      category: "",
+      subcategory: "",
+      lang: "en-US",
+    };
+    if (window.location.search) {
+      var up = programsUrlParams();
+      if (up.has("location")) {
+        initCat.location = up.get("location") || "";
+      }
+      if (up.has("category")) {
+        initCat.category = up.get("category") || "";
+      }
+      if (up.has("subcategory")) {
+        initCat.subcategory = up.get("subcategory") || "";
+      }
+    }
+
     $.ajax({
       type: "GET",
       url: API_CATEGORIES,
-      data: {
-        location: "",
-        category: "",
-        subcategory: "",
-        lang: "en-US",
-      },
+      data: initCat,
       success: function (result) {
         $("#search-container").html(result);
+        syncProgramsFormFromUrl();
         tryAutofillPostalFromIp();
+        refreshResults(resultsPayloadFromForm(), false);
       },
       error: function () {
         $("#search-container").html(
@@ -578,13 +830,19 @@
         );
       },
     });
-
-    refreshResults(nationalSearchPayload());
   }
 
   $(function () {
     bindDelegatedUi();
     loadMapSvg();
     initCategoriesAndResults();
+
+    $(window).on("popstate", function () {
+      if (!$("#program-subcategory").length) {
+        return;
+      }
+      syncProgramsFormFromUrl(true);
+      refreshResults(resultsPayloadFromForm(), false);
+    });
   });
 })(jQuery);
