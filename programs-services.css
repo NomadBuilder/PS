@@ -1,28 +1,19 @@
 /*
- * Living My Culture skin — tokens aligned to live site CSS
- * (https://livingmyculture.ca/culture/ — style.css + styles chunk: MetaPro,
- * culture teal #00a6c9 / #00bbce, links #018391, people green #54a437, etc.)
+ * Programs widget: About Grief layout & rhythm, Living My Culture palette.
+ * Structure mirrors aboutgrief.ca grief-topic CSS (dividers, buttons, accordion).
+ * Colors: LMC MetaPro stack, #215352 / #018391 / #27326b / #00a6c9 accents.
  */
 :root {
   --lmc-text: #215352;
   --lmc-text-muted: #527883;
   --lmc-link: #018391;
   --lmc-link-hover: #106476;
-  /* Culture tab / primary actions */
-  --lmc-culture: #00a6c9;
-  --lmc-culture-bright: #00bbce;
-  --lmc-accent: #009dbd;
-  --lmc-accent-dark: #0096b5;
-  --lmc-intro: #00a7c9;
-  --lmc-topic: #6c2373;
-  --lmc-people: #54a437;
-  --lmc-people-hover: #5cb83b;
-  --lmc-soft: #e4f9ff;
-  --lmc-soft-warm: #f6f4f4;
-  --lmc-highlight: #a7e36c;
   --lmc-navy: #27326b;
-  --lmc-border: #dcdcdc;
-  --lmc-border-strong: #c5ddd9;
+  --lmc-navy-hover: #315a85;
+  --lmc-culture: #00a6c9;
+  --lmc-divider: #bcdfe6;
+  --lmc-divider-soft: #dfdfdf;
+  --lmc-input-border: #d5dad1;
   --lmc-white: #fff;
   --lmc-max: 1100px;
 }
@@ -49,7 +40,6 @@ body.lmc-programs-page {
   padding-right: max(0px, env(safe-area-inset-right, 0px));
 }
 
-/* About Grief chrome hosts (content is inside shadow roots) */
 .lmc-chrome-header,
 .lmc-chrome-footer {
   display: block;
@@ -65,13 +55,13 @@ body.lmc-programs-page {
   text-align: center;
   font-size: 14px;
   color: var(--lmc-text-muted);
-  background: var(--lmc-soft);
-  border-bottom: 1px solid var(--lmc-border);
+  background: #f6f4f4;
+  border-bottom: 1px solid var(--lmc-divider-soft);
 }
 
 .lmc-chrome-footer .lmc-chrome-fallback {
   border-bottom: none;
-  border-top: 1px solid var(--lmc-border);
+  border-top: 1px solid var(--lmc-divider-soft);
 }
 
 a {
@@ -98,7 +88,6 @@ a:hover {
   border: 2px solid var(--lmc-culture);
 }
 
-/* Embed / iframe: no site chrome; parent page supplies header & footer */
 .lmc-visually-hidden {
   position: absolute !important;
   width: 1px;
@@ -114,19 +103,19 @@ a:hover {
 .lmc-widget-main {
   max-width: var(--lmc-max);
   margin: 0 auto;
-  padding: 12px 16px 24px;
+  padding: 12px 16px 32px;
 }
 
-/* —— Map —— */
+/* —— Map (simple frame, not a “card”) —— */
 .lmc-map-section {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .lmc-map-card {
-  background: linear-gradient(180deg, #f6fcfd 0%, var(--lmc-soft) 100%);
-  border: 1px solid var(--lmc-border-strong);
-  border-radius: 8px;
-  padding: 16px;
+  background: var(--lmc-white);
+  border: 1px solid var(--lmc-divider-soft);
+  border-radius: 0;
+  padding: 12px 12px 16px;
   overflow: hidden;
 }
 
@@ -140,7 +129,7 @@ a:hover {
 
 .lmc-map-card .canada-map .map-location {
   cursor: pointer;
-  transition: fill 0.15s ease, opacity 0.15s ease;
+  transition: fill 0.12s ease;
 }
 
 .lmc-map-card .canada-map .st0,
@@ -150,164 +139,188 @@ a:hover {
 .lmc-map-card .canada-map .st4,
 .lmc-map-card .canada-map .st5,
 .lmc-map-card .canada-map .st6 {
-  fill: #d7f1f7;
+  fill: #e8f4f2;
   stroke: #215352;
   stroke-width: 0.35;
 }
 
 .lmc-map-card .canada-map .map-location:hover,
 .lmc-map-card .canada-map .map-location:focus {
-  fill: var(--lmc-culture-bright);
+  fill: #c5ebe8;
   stroke: var(--lmc-navy);
 }
 
 .lmc-map-card .canada-map text {
-  fill: var(--lmc-navy);
+  fill: var(--lmc-text);
   pointer-events: none;
   font-family: MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .lmc-map-hint {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
   text-align: center;
   font-size: 14px;
-  color: var(--lmc-intro);
-  font-style: italic;
+  color: var(--lmc-text-muted);
+  font-style: normal;
 }
 
-/* —— Program service block (server class names preserved) —— */
+/* —— Search block (About Grief–style flat band, not a floating card) —— */
 #program-service {
   scroll-margin-top: 16px;
 }
 
 #program-service h2.h2,
 .program-service h2.h2 {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   padding: 0;
   font: 400 24px/30px MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--lmc-link);
 }
 
 .program-service__form {
-  background: var(--lmc-white);
-  border: 1px solid var(--lmc-border);
-  border-radius: 8px;
-  padding: 20px 20px 8px;
-  margin-bottom: 28px;
-  box-shadow: 0 1px 4px rgba(0, 96, 100, 0.08);
+  margin: 0 0 24px;
+  padding: 13px 0 20px;
+  border: none;
+  border-bottom: 1px solid var(--lmc-divider-soft);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .program-service__form .form-block {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px 24px;
-  margin-bottom: 16px;
+  gap: 12px 20px;
+  margin-bottom: 14px;
 }
 
 .program-service__form .form-block__item {
-  flex: 1 1 200px;
-  min-width: 160px;
+  flex: 0 1 auto;
+  min-width: 200px;
+  max-width: 48%;
 }
 
 .program-service__form label {
   display: block;
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
   color: var(--lmc-text);
+  text-transform: none;
+  letter-spacing: 0.01em;
 }
 
 .program-service__form .form-select,
 .program-service__form .form-input {
   width: 100%;
   padding: 10px 12px;
-  font: inherit;
+  font: normal 16px/1.35 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--lmc-text);
-  border: 1px solid var(--lmc-border);
-  border-radius: 6px;
+  border: 1px solid var(--lmc-input-border);
+  border-radius: 2px;
   background: var(--lmc-white);
 }
 
 .program-service__form .form-select:focus,
 .program-service__form .form-input:focus {
-  outline: 2px solid var(--lmc-culture);
-  outline-offset: 1px;
+  outline: 2px solid rgba(0, 166, 201, 0.35);
+  outline-offset: 0;
   border-color: var(--lmc-culture);
 }
 
 .form-buttons-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
-  padding: 8px 0 16px;
+  padding: 6px 0 0;
 }
 
+/* About Grief: filled primary + outlined secondary — colors → LMC navy / link */
 .form-submit {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  font: 600 15px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  justify-content: center;
+  gap: 6px;
+  min-width: 120px;
+  padding: 10px 20px;
+  font: 700 14px/1.2 "Open Sans", MetaPro, "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--lmc-white);
-  background: linear-gradient(180deg, var(--lmc-culture-bright) 0%, var(--lmc-accent) 100%);
-  border: none;
-  border-radius: 6px;
+  background: var(--lmc-navy);
+  border: 1px solid var(--lmc-white);
+  border-radius: 10px;
   cursor: pointer;
-  transition: filter 0.15s ease, background 0.15s ease;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .form-submit:hover {
-  background: var(--lmc-accent-dark);
-  filter: brightness(0.98);
+  background: var(--lmc-navy-hover);
+  color: var(--lmc-white);
 }
 
 .program-reset {
-  padding: 12px 18px;
-  font: inherit;
-  font-weight: 600;
-  color: var(--lmc-text);
+  padding: 10px 20px;
+  font: 700 15px/1.2 "Open Sans", MetaPro, "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--lmc-navy);
   background: transparent;
-  border: 1px solid var(--lmc-border);
-  border-radius: 6px;
+  border: 2px solid var(--lmc-navy);
+  border-radius: 10px;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .program-reset:hover {
-  border-color: var(--lmc-culture);
-  background: var(--lmc-soft-warm);
+  background: rgba(39, 50, 107, 0.06);
+  color: var(--lmc-navy-hover);
+  border-color: var(--lmc-navy-hover);
 }
 
-/* —— Results —— */
+/* —— Results (About Grief list + accordion rhythm) —— */
 #results-container {
-  min-height: 120px;
+  min-height: 100px;
 }
 
 .program-service__lists {
+  padding: 10px 0 10px;
   color: var(--lmc-text);
+  border-radius: 0;
 }
 
 .program-service__lists .mb-20 {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .program-service__lists .mb-20 i {
-  color: var(--lmc-intro);
+  color: var(--lmc-text-muted);
   font-style: italic;
+}
+
+.program-service__lists .mb-20 i b {
+  color: var(--lmc-text);
+  font-style: normal;
+  font-weight: 700;
 }
 
 .program-service__lists .click-text.display-default-all-sites,
 .program-service__lists .click-text.display-grief {
-  color: var(--lmc-intro);
+  color: var(--lmc-text-muted);
+  font-style: italic;
 }
 
 .program-service__title {
-  margin: 28px 0 12px;
+  margin: 8px 0 6px;
   padding: 0;
-  font: 700 18px/24px MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: var(--lmc-text);
+  font: 400 28px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-link);
 }
 
 .program-service__title:first-child {
@@ -315,7 +328,7 @@ a:hover {
 }
 
 .program-service__text-block {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .text-blue {
@@ -326,13 +339,22 @@ a:hover {
   font-weight: 600;
 }
 
-/* FAQ accordion */
+/* Category blocks: teal top rule like About Grief .faq__items */
 .faq__items {
-  border: 1px solid var(--lmc-border);
-  border-radius: 8px;
-  margin-bottom: 12px;
-  overflow: hidden;
-  background: var(--lmc-white);
+  border: none;
+  border-top: 1px solid var(--lmc-divider);
+  margin-top: 18px;
+  margin-bottom: 14px;
+  padding-top: 18px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.faq__items:first-of-type,
+.program-service-block .faq > .faq__items:first-child {
+  border-top: none;
+  margin-top: 6px;
+  padding-top: 6px;
 }
 
 .faq__item-accordion {
@@ -340,33 +362,34 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 8px 0 10px;
   cursor: pointer;
-  background: var(--lmc-soft);
-  border-bottom: 1px solid var(--lmc-border);
-  transition: background 0.15s ease;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--lmc-divider-soft);
+  transition: none;
 }
 
 .faq__item-accordion:hover {
-  background: #dff2ef;
+  background: rgba(0, 166, 201, 0.04);
 }
 
+/* About Grief uses Capriola + #317d73 for .h3 — LMC: MetaPro + link teal */
 .faq__item-accordion .h3 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--lmc-navy);
+  font: 400 24px/1.25 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-link);
 }
 
 .faq__item-accordion .faq__item-icon {
-  color: var(--lmc-culture);
+  color: var(--lmc-link);
   flex-shrink: 0;
+  font-size: 15px;
 }
 
-/* Match About Grief: category panel visibility is tied to accordion, not a parent wrapper */
 .faq__item-accordion + .faq__items-wrapper {
   display: none;
-  padding: 8px 0 12px;
+  padding: 4px 0 8px;
 }
 
 .faq__item-accordion.-active + .faq__items-wrapper {
@@ -374,28 +397,44 @@ a:hover {
 }
 
 .faq__item-accordion.-active {
-  box-shadow: inset 3px 0 0 0 var(--lmc-culture-bright);
+  box-shadow: none;
+  border-bottom-color: var(--lmc-divider);
 }
 
 .faq__items-sub {
-  padding: 8px 16px 0;
+  padding: 6px 0 0;
 }
 
 .faq__items-sub h4 {
-  margin: 12px 0 8px;
-  font-size: 0.95rem;
+  margin: 10px 0 6px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--lmc-text-muted);
   text-transform: none;
 }
 
 .faq__item {
-  border-top: 1px solid var(--lmc-border);
+  border: none;
+  padding: 0;
+  border-top: 1px solid var(--lmc-divider-soft);
+}
+
+.faq__item:last-child {
+  border-bottom: 1px solid var(--lmc-divider-soft);
+}
+
+/* Listing row title: About Grief .faq__item-title blue → LMC link */
+.faq__item-title,
+.program-service .faq__item-title {
+  color: var(--lmc-link);
+  font-size: 18px;
+  font-weight: 600;
+  padding: 2px 0;
 }
 
 .faq__item-block {
   margin: 0;
-  padding: 12px 16px;
+  padding: 10px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -404,13 +443,15 @@ a:hover {
 }
 
 .faq__item-block:hover {
-  background: #f7fcfb;
+  background: rgba(1, 131, 145, 0.05);
 }
 
 .faq__item-info {
   display: none;
-  padding: 0 16px 16px;
-  border-top: 1px dashed var(--lmc-border);
+  padding: 12px 0 16px;
+  font-size: 16px;
+  line-height: 1.55;
+  border-top: 1px dashed var(--lmc-divider-soft);
 }
 
 .faq__item-icon .fa-minus {
@@ -462,29 +503,29 @@ a:hover {
   padding-left: 0.35rem;
 }
 
-/* Pagination if present */
 #pagination_button {
   display: inline-block;
   margin-top: 16px;
-  padding: 10px 18px;
-  font: 600 15px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 10px 20px;
+  font: 700 14px/1.2 "Open Sans", MetaPro, Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   color: var(--lmc-white);
   background: var(--lmc-navy);
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
 #pagination_button:hover {
-  background: #315a85;
+  background: var(--lmc-navy-hover);
 }
 
-/* Footer actions */
 .lmc-page-actions {
-  margin-top: 40px;
+  margin-top: 36px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   align-items: flex-start;
 }
 
@@ -493,12 +534,12 @@ a:hover {
   padding: 10px 18px;
   font-weight: 600;
   color: var(--lmc-navy);
-  border: 1px solid var(--lmc-border);
-  border-radius: 6px;
+  border: 1px solid var(--lmc-divider-soft);
+  border-radius: 2px;
 }
 
 .return-btn:hover {
-  background: var(--lmc-soft);
+  background: #f6f4f4;
   text-decoration: none;
 }
 
@@ -507,19 +548,19 @@ a:hover {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  font: 600 15px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
   color: var(--lmc-white);
-  background: var(--lmc-people);
-  border-radius: 6px;
+  background: var(--lmc-link);
+  border-radius: 2px;
 }
 
 .btn-more:hover {
-  background: var(--lmc-people-hover);
+  background: var(--lmc-link-hover);
   text-decoration: none;
 }
 
 .lmc-loading {
-  padding: 32px;
+  padding: 28px;
   text-align: center;
   color: var(--lmc-text-muted);
 }
@@ -528,7 +569,6 @@ a:hover {
   color: #a32020;
 }
 
-/* —— Mobile & touch —— */
 .form-submit,
 .program-reset,
 .return-btn,
@@ -539,30 +579,15 @@ a:hover {
 
 @media screen and (max-width: 639px) {
   .lmc-widget-main {
-    padding: 8px 12px 20px;
+    padding: 8px 12px 24px;
   }
 
   .lmc-map-section {
-    margin-bottom: 24px;
-  }
-
-  .lmc-map-card {
-    padding: 10px;
-    border-radius: 6px;
-  }
-
-  .lmc-map-hint {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .program-service__form .form-block {
-    flex-direction: column;
-    gap: 12px;
+    margin-bottom: 20px;
   }
 
   .program-service__form .form-block__item {
-    flex: 1 1 100%;
+    max-width: 100%;
     min-width: 0;
   }
 
@@ -598,18 +623,21 @@ a:hover {
   }
 
   .faq__item-accordion {
-    padding: 16px 12px;
+    padding: 12px 0;
     min-height: 48px;
   }
 
+  .faq__item-accordion .h3 {
+    font-size: 20px;
+  }
+
   .faq__item-block {
-    padding: 14px 12px;
+    padding: 12px 0;
     min-height: 48px;
   }
 
   .program-service__title {
-    font-size: 1.1rem;
-    margin: 20px 0 10px;
+    font-size: 22px;
   }
 
   #results-container {
