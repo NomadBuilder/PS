@@ -210,14 +210,6 @@
     if (d.page != null && String(d.page).trim() !== "") {
       o.page = String(d.page).trim();
     }
-    /**
-     * About Grief POST returns an empty #results-container when "Who is it for" (subcategory)
-     * is set but national location is "". The form uses value="" for Canada; POST needs
-     * location=Canada to render national audience-filtered HTML (curl-verified vs ?location=).
-     */
-    if ($.trim(o.subcategory) !== "" && $.trim(o.location) === "") {
-      o.location = "Canada";
-    }
     return o;
   }
 
@@ -386,6 +378,12 @@
       url: API_PAGE,
       type: "POST",
       crossDomain: true,
+      /* Same as About Grief Common.js: without this, POST returns a full HTML page with an empty
+         #results-container for some filters (e.g. Indigenous); with it, the surface returns the
+         results fragment only — provincial breakdown matches the main site. */
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
       data: data,
       traditional: true,
       success: function (result) {
