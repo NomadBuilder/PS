@@ -45,6 +45,13 @@ body.lmc-programs-page {
   padding-right: max(0px, env(safe-area-inset-right, 0px));
 }
 
+.lmc-programs-embed,
+.lmc-programs-gtm-root {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .lmc-chrome-header,
 .lmc-chrome-footer {
   display: block;
@@ -106,9 +113,11 @@ a:hover {
 }
 
 .lmc-widget-main {
+  width: 100%;
   max-width: var(--lmc-max);
   margin: 0 auto;
   padding: 12px 16px 32px;
+  box-sizing: border-box;
 }
 
 /* —— Map (simple frame, not a “card”) —— */
@@ -172,6 +181,9 @@ a:hover {
 /* —— Search block (About Grief–style flat band, not a floating card) —— */
 #program-service {
   scroll-margin-top: 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 #program-service h2.h2,
@@ -183,6 +195,8 @@ a:hover {
 }
 
 .program-service__form {
+  width: 100%;
+  max-width: 100%;
   margin: 0 0 24px;
   padding: 13px 0 20px;
   border: none;
@@ -192,17 +206,23 @@ a:hover {
   box-shadow: none;
 }
 
+/*
+ * About Grief uses ~220px-wide controls inside a full-width coloured band, so
+ * their CSS caps .form-input. On LMC/embed the page is full width — keeping
+ * 220px max-width made the whole form a thin strip. Use a responsive grid so
+ * fields grow like AG’s wide layout without the AG background wrapper.
+ */
 .program-service__form .form-block {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 16px 24px;
+  margin-bottom: 16px;
+  width: 100%;
 }
 
 .program-service__form .form-block__item {
-  flex: 0 1 auto;
-  min-width: 200px;
-  max-width: 48%;
+  min-width: 0;
+  max-width: none;
 }
 
 .program-service__form label {
@@ -218,7 +238,7 @@ a:hover {
 .program-service .form-select,
 .program-service .form-input {
   width: 100%;
-  max-width: 220px;
+  max-width: 100%;
   height: 38px;
   padding: 8px 7px;
   font: normal 16px/1.25 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -242,6 +262,7 @@ a:hover {
   gap: 14px;
   align-items: center;
   padding: 6px 0 0;
+  width: 100%;
 }
 
 /* About Grief: filled primary + outlined secondary — colors → LMC navy / link */
