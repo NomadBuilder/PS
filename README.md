@@ -50,3 +50,11 @@ python3 -m http.server 8765
 ```
 
 Open `http://127.0.0.1:8765/index.html` (uses `LMC_PROGRAMS_DATA_BASE` relative to this folder).
+
+## Smoke test (deployed site)
+
+```bash
+python3 scripts/smoke_test.py "https://nomadbuilder.github.io/PS/"
+```
+
+Optional second argument is the base URL; defaults to that URL. Verifies manifest, every fragment, search form, and core assets return HTTP 200 with expected content.
