@@ -151,7 +151,9 @@
     window.history.replaceState({}, "", baseUrl + params);
   }
 
-  window.refreshResults = function (data) {
+  window.refreshResults = function (data, scrollToResults) {
+    scrollToResults = !!scrollToResults;
+
     $("#results-container").html(
       '<p class="lmc-loading" role="status">Loading programs…</p>'
     );
@@ -181,14 +183,14 @@
           );
           $("#results-container").html(html);
           enhanceNationalDefaultView();
+          if (scrollToResults) {
+            scrollResultsIntoView();
+          }
         })
         .catch(function () {
           $("#results-container").html(
             '<p class="lmc-loading lmc-loading--error">Unable to load static program data. Check the manifest and fragment URLs.</p>'
           );
-        })
-        .finally(function () {
-          scrollResultsIntoView();
         });
       return;
     }
@@ -211,6 +213,9 @@
           absolutizeAboutGriefMediaInHtml(fragment)
         );
         enhanceNationalDefaultView();
+        if (scrollToResults) {
+          scrollResultsIntoView();
+        }
       },
       error: function (xhr) {
         if (
@@ -225,9 +230,6 @@
         $("#results-container").html(
           '<p class="lmc-loading lmc-loading--error">Unable to load results. Try again later.</p>'
         );
-      },
-      complete: function () {
-        scrollResultsIntoView();
       },
     });
   };
@@ -262,7 +264,7 @@
       updateQueryString("category", category || "");
       updateQueryString("subcategory", subcategory || "");
 
-      refreshResults(next);
+      refreshResults(next, true);
       return;
     }
 
@@ -296,7 +298,7 @@
         updateQueryString("category", category || "");
         updateQueryString("subcategory", subcategory || "");
 
-        refreshResults(next);
+        refreshResults(next, true);
       },
       error: function () {
         $("#search-container").html(
@@ -424,13 +426,16 @@
       updateQueryString("radius", radius);
       updateQueryString("postalCode", postalCode);
 
-      refreshResults({
-        location: location,
-        category: category,
-        subcategory: subcategory,
-        radius: radius,
-        postalCode: postalCode,
-      });
+      refreshResults(
+        {
+          location: location,
+          category: category,
+          subcategory: subcategory,
+          radius: radius,
+          postalCode: postalCode,
+        },
+        true
+      );
     });
 
     $(document).on("click", "#reset", function (e) {
@@ -446,7 +451,7 @@
       $("#program-subcategory").val("");
       $("#program-radius").val("0");
       $("input#postalCode").val("");
-      refreshResults(nationalSearchPayload());
+      refreshResults(nationalSearchPayload(), true);
     });
 
     $(document).on("change blur", "#postalCode", function () {
@@ -457,14 +462,17 @@
       e.preventDefault();
       var page = $(this).attr("data-page");
       updateQueryString("page", page || "");
-      refreshResults({
-        page: page,
-        location: $("#program-location").val() || "",
-        category: $("#program-category").val() || "",
-        subcategory: $("#program-subcategory").val() || "",
-        radius: $("#program-radius").val() || "0",
-        postalCode: $("input#postalCode").val() || "",
-      });
+      refreshResults(
+        {
+          page: page,
+          location: $("#program-location").val() || "",
+          category: $("#program-category").val() || "",
+          subcategory: $("#program-subcategory").val() || "",
+          radius: $("#program-radius").val() || "0",
+          postalCode: $("input#postalCode").val() || "",
+        },
+        true
+      );
     });
 
     $(document).on(
