@@ -9,6 +9,7 @@ Requires: pip install -r scripts/requirements.txt
 from __future__ import annotations
 
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -27,6 +28,24 @@ ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "programs-manifest.json"
 SESSION = requests.Session()
 SESSION.headers.update(HEADERS)
+
+
+def strip_fragment_click_hints(inner: str) -> str:
+    """Remove About Grief boilerplate lines we do not want on LMC."""
+    pat1 = re.compile(
+        r'(<div class="program-service__lists">)\s*'
+        r'<p class="click-text display-default-all-sites"><b>Click on one of the listings below and you will get their full details</b></p>\s*',
+        re.MULTILINE,
+    )
+    pat2 = re.compile(
+        r'<div class="program-service__text-block">\s*'
+        r'<p class="click-text display-grief"><b>Click on the listing for details or filter your results using the search bar above\.</b></p>\s*'
+        r"</div>\s*",
+        re.MULTILINE,
+    )
+    inner = pat1.sub(r"\1\n", inner, count=1)
+    inner = pat2.sub("", inner, count=1)
+    return inner
 
 
 def extract_results_inner(html: str) -> str:
@@ -135,7 +154,7 @@ def main() -> int:
             print("POST programs", label, "…")
             pr = SESSION.post(API_PROGRAMS, data=data, timeout=180)
             pr.raise_for_status()
-        inner = extract_results_inner(pr.text)
+        inner = strip_fragment_click_hints(extract_results_inner(pr.text))
         out.write_text(inner, encoding="utf-8")
         print(" ", rel_path, len(inner), "bytes")
         time.sleep(0.35)
