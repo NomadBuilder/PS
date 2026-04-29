@@ -10,10 +10,13 @@
   the script to no-op unless ?programs&services (or both keys) is present.
 
   Remove the jQuery branch if the host page already loads jQuery 3.x.
+
+  Bump CSS_VER after CSS changes on GitHub Pages so visitors skip stale cache.
 -->
 <script>
   (function () {
     var BASE = "https://nomadbuilder.github.io/PS/";
+    var CSS_VER = "3";
     window.LMC_PROGRAMS_DATA_BASE = BASE;
 
     /* Uncomment to require ?programs&services even if the GTM trigger is broad:
@@ -96,7 +99,7 @@
         crossOrigin: "anonymous",
       }
     );
-    ensureLink("stylesheet", BASE + "programs-services.css");
+    ensureLink("stylesheet", BASE + "programs-services.css?v=" + CSS_VER);
 
     var WIDGET_HTML =
       '<div class="lmc-programs-page lmc-programs-embed lmc-programs-gtm-root">' +

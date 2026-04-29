@@ -45,6 +45,27 @@ def strip_fragment_click_hints(inner: str) -> str:
     )
     inner = pat1.sub(r"\1\n", inner, count=1)
     inner = pat2.sub("", inner, count=1)
+
+    soup = BeautifulSoup(f'<div id="_lmc_frag_root">{inner}</div>', "html.parser")
+    root = soup.find(id="_lmc_frag_root")
+    if root:
+
+        def has_class(el, part: str) -> bool:
+            c = el.get("class")
+            if not c:
+                return False
+            if isinstance(c, str):
+                return part in c.split()
+            return part in c
+
+        for p in list(root.find_all("p")):
+            if has_class(p, "click-text"):
+                p.decompose()
+        for div in list(root.find_all("div")):
+            if has_class(div, "program-service__text-block"):
+                if not div.get_text(strip=True):
+                    div.decompose()
+        inner = root.decode_contents()
     return inner
 
 

@@ -411,14 +411,14 @@ a:hover {
   font-weight: 700;
 }
 
+/* About Grief omits these hints in the results list; hide if export still includes them. */
 .program-service__lists .click-text.display-default-all-sites,
 .program-service__lists .click-text.display-grief {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 16px;
-  line-height: 1.45;
-  color: var(--lmc-text);
-  font-style: italic;
+  display: none !important;
+}
+
+.program-service__text-block:empty {
+  display: none !important;
 }
 
 .program-service__title {
@@ -444,24 +444,26 @@ a:hover {
   font-weight: 600;
 }
 
-/* Category blocks — About Grief .faq__items spacing + rule */
+/* Category blocks — spacing like About Grief (fewer rules than stacked borders). */
 .faq__items {
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
-  margin-bottom: 15px;
-  padding-top: 20px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
   border: none;
-  border-top: 1px solid var(--ag-faq-rule);
   border-radius: 0;
   background: transparent;
 }
 
 .program-service-block .faq > .faq__items:first-child,
 .faq__items:first-of-type {
-  border-top: none;
-  margin-top: 5px;
-  padding-top: 5px;
+  margin-top: 4px;
+  padding-top: 0;
+}
+
+.program-service-block .faq > .faq__items + .faq__items {
+  margin-top: 1.75rem;
 }
 
 .faq__item-accordion {
@@ -517,7 +519,7 @@ a:hover {
 
 .faq__item-accordion.-active {
   box-shadow: none;
-  border-bottom-color: var(--lmc-divider);
+  border-bottom-color: var(--lmc-divider-soft);
 }
 
 .faq__items-sub {
@@ -530,20 +532,24 @@ a:hover {
 
 #results-container .faq__items-sub h4,
 #results-container .program-service-block h4 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
+  padding-top: 4px;
   font: 700 19px/1.3 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--lmc-text);
   text-transform: uppercase;
 }
 
+#results-container .faq__items-sub + .faq__items-sub h4 {
+  margin-top: 10px;
+}
+
 .faq__item {
   border: none;
   padding: 0;
-  border-top: 1px solid var(--lmc-divider-soft);
 }
 
 .faq__item:last-child {
-  border-bottom: 1px solid var(--lmc-divider-soft);
+  border-bottom: none;
 }
 
 /* About Grief .faq__item-title: 20px / 600 / #0557b4 */
@@ -575,11 +581,11 @@ a:hover {
 
 .faq__item-info {
   display: none;
-  padding: 15px 0;
+  padding: 15px 0 10px;
   font-size: 18px;
   line-height: 1.55;
   color: var(--lmc-text);
-  border-top: 1px dashed var(--lmc-divider-soft);
+  border-top: none;
 }
 
 .faq__item-icon .fa-minus {
