@@ -386,6 +386,11 @@
       });
     });
 
+    $(document).on("submit", "#programs-services-form", function (e) {
+      e.preventDefault();
+      $("#submit").trigger("click");
+    });
+
     $(document).on("click", "#submit", function (e) {
       e.preventDefault();
       var location = $("#program-location").val() || "";
