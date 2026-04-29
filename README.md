@@ -1,8 +1,10 @@
 # PS — Programs & services (GitHub Pages + GTM)
 
-**Live site:** [https://nomadbuilder.github.io/PS/](https://nomadbuilder.github.io/PS/)
+**How this fits your goal (GTM on LMC only):** Visitors still use **[LivingMyCulture.ca](https://livingmyculture.ca/)** as normal. **Google Tag Manager** injects one Custom HTML tag that loads the widget. That tag points at **this GitHub Pages site** only as a **static file host** (like a small CDN): `programs-manifest.json` plus **HTML fragments** per region (and the JS/CSS/SVG). We use **JSON for the manifest** and **`.html` files for listing bodies** because it is simple and avoids one huge JSON blob; the widget can also read a fragment file that contains JSON `{ "html": "..." }` if you prefer. **You do not publish a separate “programs page” on GitHub for end users**—Pages is just where GTM-fetched assets live.
 
-**Data source:** Exported HTML from [About Grief — Programs & services](https://aboutgrief.ca/programs-and-services/). Refresh periodically with the export script below.
+**Demo / QA URL:** [https://nomadbuilder.github.io/PS/](https://nomadbuilder.github.io/PS/) (optional; same files GTM loads).
+
+**Data source:** Exported HTML from [About Grief — Programs & services](https://aboutgrief.ca/programs-and-services/). Refresh periodically with the export script below. (Any old “Replace with exported #results-container…” notes were dev placeholders; current `fragments/*.html` are filled by `scripts/export_aboutgrief.py`.)
 
 ## Header / footer on LMC
 
