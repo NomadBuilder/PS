@@ -374,35 +374,95 @@
       return;
     }
 
-    $.ajax({
-      url: API_PAGE,
-      type: "POST",
-      crossDomain: true,
-      /* Same as About Grief Common.js: without this, POST returns a full HTML page with an empty
-         #results-container for some filters (e.g. Indigenous); with it, the surface returns the
-         results fragment only — provincial breakdown matches the main site. */
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-      },
-      data: data,
-      traditional: true,
-      success: function (result) {
+    function programsPostAjax(postData, withXHRHeader) {
+      var opts = {
+        url: API_PAGE,
+        type: "POST",
+        crossDomain: true,
+        data: postData,
+        traditional: true,
+      };
+      /* About Grief returns the real results fragment only with this header (same as their
+         Common.js). Cross-origin browsers may block that header (CORS preflight). */
+      if (withXHRHeader) {
+        opts.headers = { "X-Requested-With": "XMLHttpRequest" };
+      }
+      return $.ajax(opts);
+    }
+
+    function isProgramsPostFragmentEmpty(fragment) {
+      if (fragment == null) {
+        return true;
+      }
+      var s = String(fragment);
+      if (!$.trim(s)) {
+        return true;
+      }
+      return (
+        s.indexOf("program-service__lists") < 0 &&
+        s.indexOf("program-service__title") < 0
+      );
+    }
+
+    /** Full-page POST omits list markup for national + audience unless we send location=Canada. */
+    function payloadForCrossOriginFallback(postData) {
+      var o = $.extend({}, postData);
+      if ($.trim(o.subcategory) !== "" && $.trim(o.location) === "") {
+        o.location = "Canada";
+      }
+      return o;
+    }
+
+    function renderProgramsFragment(fragment) {
+      $("#results-container").html(absolutizeAboutGriefMediaInHtml(fragment));
+      enhanceNationalDefaultView();
+      if (scrollToResults) {
+        scrollResultsIntoView();
+      }
+    }
+
+    function showProgramsAjaxError() {
+      $("#results-container").html(
+        '<p class="lmc-loading lmc-loading--error">Unable to load results. Try again later.</p>'
+      );
+    }
+
+    var didFallbackAttempt = false;
+    function trySimplePostFallback() {
+      if (didFallbackAttempt) {
+        showProgramsAjaxError();
+        return;
+      }
+      didFallbackAttempt = true;
+      var fb = payloadForCrossOriginFallback(data);
+      programsPostAjax(fb, false)
+        .done(function (result) {
+          var fragment = extractResultsFragment(result);
+          if (fragment === null || isProgramsPostFragmentEmpty(fragment)) {
+            showProgramsAjaxError();
+            return;
+          }
+          renderProgramsFragment(fragment);
+        })
+        .fail(function () {
+          showProgramsAjaxError();
+        });
+    }
+
+    programsPostAjax(data, true)
+      .done(function (result) {
         var fragment = extractResultsFragment(result);
         if (fragment === null) {
-          $("#results-container").html(
-            '<p class="lmc-loading lmc-loading--error">Unable to parse results from the server response.</p>'
-          );
+          trySimplePostFallback();
           return;
         }
-        $("#results-container").html(
-          absolutizeAboutGriefMediaInHtml(fragment)
-        );
-        enhanceNationalDefaultView();
-        if (scrollToResults) {
-          scrollResultsIntoView();
+        if (!isProgramsPostFragmentEmpty(fragment)) {
+          renderProgramsFragment(fragment);
+          return;
         }
-      },
-      error: function (xhr) {
+        trySimplePostFallback();
+      })
+      .fail(function (xhr) {
         if (
           xhr.status === 500 &&
           xhr.responseText &&
@@ -412,11 +472,8 @@
             "Please check the validity of Google Geolocation API key."
           );
         }
-        $("#results-container").html(
-          '<p class="lmc-loading lmc-loading--error">Unable to load results. Try again later.</p>'
-        );
-      },
-    });
+        trySimplePostFallback();
+      });
   };
 
   window.refreshCategories = function (data) {
