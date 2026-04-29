@@ -1,54 +1,133 @@
 <!--
-  GTM: ONE Custom HTML tag (e.g. trigger on DOM Ready for program pages).
+  GTM: ONE Custom HTML tag — Living My Culture keeps real header/footer.
 
-  About Grief blocks cross-origin iframes (X-Frame-Options). Header/footer use
-  aboutgrief-chrome.js: fetch + Shadow DOM — not an iframe.
+  Mount: replaces everything INSIDE the first div.center (Umbraco main column).
+  Use a trigger so this tag only fires when you want (e.g. Page Path contains
+  /culture/ AND Query contains programs — see PS/README.md).
 
-  Remove the jQuery <script> line if the host page already loads jQuery 3.x.
+  Optional extra guard: uncomment the URLSearchParams block below if you want
+  the script to no-op unless ?programs&services (or both keys) is present.
+
+  Remove the jQuery branch if the host page already loads jQuery 3.x.
 -->
 <script>
-  window.LMC_PROGRAMS_DATA_BASE = "https://nomadbuilder.github.io/PS/";
+  (function () {
+    var BASE = "https://nomadbuilder.github.io/PS/";
+    window.LMC_PROGRAMS_DATA_BASE = BASE;
+
+    /* Uncomment to require ?programs&services even if the GTM trigger is broad:
+    try {
+      var q = new URLSearchParams(window.location.search);
+      if (!q.has("programs") || !q.has("services")) return;
+    } catch (e) {
+      return;
+    }
+    */
+
+    var center =
+      document.querySelector("div.center") || document.querySelector(".center");
+    if (!center) {
+      console.warn("[LMC programs] No div.center found; widget not mounted.");
+      return;
+    }
+    if (center.querySelector(".lmc-programs-gtm-root")) {
+      return;
+    }
+
+    function ensureLink(rel, href, opts) {
+      opts = opts || {};
+      var sel = 'link[data-lmc-programs][href="' + href.replace(/"/g, "") + '"]';
+      if (document.querySelector(sel)) return;
+      var l = document.createElement("link");
+      l.rel = rel;
+      l.href = href;
+      l.setAttribute("data-lmc-programs", "1");
+      if (opts.integrity) l.integrity = opts.integrity;
+      if (opts.crossOrigin) l.crossOrigin = opts.crossOrigin;
+      document.head.appendChild(l);
+    }
+
+    ensureLink("preconnect", "https://fonts.googleapis.com");
+    ensureLink("preconnect", "https://fonts.gstatic.com", { crossOrigin: "anonymous" });
+    ensureLink(
+      "stylesheet",
+      "https://fonts.googleapis.com/css2?family=Capriola&display=swap"
+    );
+    ensureLink(
+      "stylesheet",
+      "https://pro.fontawesome.com/releases/v5.10.0/css/all.css",
+      {
+        integrity:
+          "sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p",
+        crossOrigin: "anonymous",
+      }
+    );
+    ensureLink("stylesheet", BASE + "programs-services.css");
+
+    var WIDGET_HTML =
+      '<div class="lmc-programs-page lmc-programs-embed lmc-programs-gtm-root">' +
+      '<a class="lmc-skip" href="#program-service">Skip to search and results</a>' +
+      '<main class="lmc-widget-main">' +
+      '<h1 class="lmc-visually-hidden">Programs and services directory</h1>' +
+      '<section class="lmc-map-section" aria-label="Canada map">' +
+      '<div class="lmc-map-card">' +
+      '<div id="map-root"></div>' +
+      '<p class="lmc-map-hint">Select a province or territory on the map to filter listings.</p>' +
+      "</div>" +
+      "</section>" +
+      '<div id="program-service" class="program-service">' +
+      '<h2 class="h2">Search</h2>' +
+      '<div id="search-container"></div>' +
+      '<div id="results-container" aria-live="polite"></div>' +
+      '<div class="lmc-page-actions">' +
+      '<a href="#program-service" class="return-btn">Return to top</a>' +
+      '<a href="mailto:canadiangriefalliance@virtualhospice.ca" class="btn-more">Submit a program or service <i class="fas fa-chevron-right" aria-hidden="true"></i></a>' +
+      "</div>" +
+      "</div>" +
+      "</main>" +
+      "</div>";
+
+    center.innerHTML = WIDGET_HTML;
+
+    function appendScript(src, opts, onload) {
+      opts = opts || {};
+      var s = document.createElement("script");
+      s.src = src;
+      if (opts.integrity) s.integrity = opts.integrity;
+      if (opts.crossOrigin) s.crossOrigin = opts.crossOrigin;
+      if (opts.defer) s.defer = true;
+      if (opts.async) s.async = true;
+      s.onload = onload || function () {};
+      s.onerror = function () {
+        console.error("[LMC programs] Failed to load", src);
+      };
+      document.head.appendChild(s);
+    }
+
+    function loadPrograms() {
+      if (document.querySelector("script[data-lmc-programs-map]")) return;
+      var s = document.createElement("script");
+      s.src = BASE + "programs-services.js";
+      s.setAttribute("data-lmc-programs-map", BASE + "canada-map.svg");
+      s.defer = true;
+      s.onerror = function () {
+        console.error("[LMC programs] Failed to load programs-services.js");
+      };
+      document.head.appendChild(s);
+    }
+
+    if (window.jQuery && window.jQuery.fn) {
+      loadPrograms();
+      return;
+    }
+
+    appendScript(
+      "https://code.jquery.com/jquery-3.5.1.min.js",
+      {
+        integrity: "sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=",
+        crossOrigin: "anonymous",
+      },
+      loadPrograms
+    );
+  })();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Capriola&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://nomadbuilder.github.io/PS/programs-services.css" />
-
-<div class="lmc-programs-page lmc-programs-embed lmc-programs-gtm-root">
-  <a class="lmc-skip" href="#program-service">Skip to search and results</a>
-
-  <div id="lmc-chrome-header" class="lmc-chrome-header" aria-busy="true" aria-label="About Grief site header"></div>
-
-  <main class="lmc-widget-main">
-    <h1 class="lmc-visually-hidden">Programs and services directory</h1>
-
-    <section class="lmc-map-section" aria-label="Canada map">
-      <div class="lmc-map-card">
-        <div id="map-root"></div>
-        <p class="lmc-map-hint">Select a province or territory on the map to filter listings.</p>
-      </div>
-    </section>
-
-    <div id="program-service" class="program-service">
-      <h2 class="h2">Search</h2>
-      <div id="search-container"></div>
-      <div id="results-container" aria-live="polite"></div>
-
-      <div class="lmc-page-actions">
-        <a href="#program-service" class="return-btn">Return to top</a>
-        <a href="mailto:canadiangriefalliance@virtualhospice.ca" class="btn-more">Submit a program or service <i class="fas fa-chevron-right" aria-hidden="true"></i></a>
-      </div>
-    </div>
-  </main>
-
-  <div id="lmc-chrome-footer" class="lmc-chrome-footer" aria-busy="true" aria-label="About Grief site footer"></div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-<script src="https://nomadbuilder.github.io/PS/aboutgrief-chrome.js" defer></script>
-<script
-  src="https://nomadbuilder.github.io/PS/programs-services.js"
-  data-lmc-programs-map="https://nomadbuilder.github.io/PS/canada-map.svg"
-  defer
-></script>

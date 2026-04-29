@@ -52,6 +52,11 @@ body.lmc-programs-page {
   box-sizing: border-box;
 }
 
+/* GTM on LMC: widget mounts inside Umbraco div.center only. */
+.center .lmc-programs-gtm-root {
+  clear: both;
+}
+
 .lmc-chrome-header,
 .lmc-chrome-footer {
   display: block;

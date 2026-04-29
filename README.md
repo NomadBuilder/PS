@@ -6,15 +6,19 @@
 
 **Data source:** Exported HTML from [About Grief — Programs & services](https://aboutgrief.ca/programs-and-services/). Refresh periodically with the export script below. (Any old “Replace with exported #results-container…” notes were dev placeholders; current `fragments/*.html` are filled by `scripts/export_aboutgrief.py`.)
 
-## Header / footer on LMC
+## Header / footer
 
-About Grief sends **`X-Frame-Options: SAMEORIGIN`**, so you **cannot** embed their header/footer in a real cross-origin `<iframe>`. This project uses **`aboutgrief-chrome.js`**: it fetches their programs page, pulls header/footer markup, rewrites asset URLs, and injects them in **Shadow DOM** so their CSS stays scoped. That is what loads when you use **`gtm-custom-html.html`**.
+- **GTM on Living My Culture (`gtm-custom-html.html`):** the snippet **replaces only the contents of `div.center`** (the main column). The real **LMC header and footer stay**; we do **not** load `aboutgrief-chrome.js` there.
+- **Standalone demo on GitHub Pages (`index.html`):** still uses **`aboutgrief-chrome.js`** to show About Grief’s header/footer in Shadow DOM, because **`X-Frame-Options`** blocks a normal cross-origin iframe of aboutgrief.ca.
 
 ## GTM on LMC
 
-1. New **Custom HTML** tag → paste contents of **`gtm-custom-html.html`** (adjust if jQuery is already on the page).
-2. Trigger: e.g. **DOM Ready** on the URL(s) where the widget should appear.
-3. **Content-Security-Policy** on LMC must allow at least:
+1. New **Custom HTML** tag → paste contents of **`gtm-custom-html.html`** (remove the jQuery `appendScript` block if the page already provides jQuery 3.x and call `loadPrograms()` after your jQuery is ready, or keep as-is).
+2. **Trigger (recommended):** **DOM Ready** with a URL rule so the tag only runs when you want the programs view, for example:
+   - **Page Path** equals `/culture/` or **Page URL** contains `livingmyculture.ca/culture`, **and**
+   - **Page URL** matches RegEx (or use a **URL / Query** variable): e.g. both `programs` and `services` appear in the query string (`?programs&services` works: `URLSearchParams` treats both as present).
+3. The script **clears `div.center` and injects** the map + search + results. Anything that was inside `.center` (intro, culture grid, partners block in that column) is removed for that page view—plan the trigger so that only happens on the intended URLs.
+4. **Content-Security-Policy** on LMC must allow at least:
    - `script-src` / `connect-src`: `https://nomadbuilder.github.io`, `https://code.jquery.com`, `https://aboutgrief.ca`
    - `style-src`: `https://nomadbuilder.github.io`, `https://pro.fontawesome.com`, `https://aboutgrief.ca`, `https://fonts.googleapis.com`
    - `font-src`: `https://fonts.gstatic.com`, `https://pro.fontawesome.com`, `https://aboutgrief.ca` as needed (Capriola loads from Google Fonts for headings)
