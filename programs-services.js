@@ -50,7 +50,7 @@
       category: "",
       subcategory: INDIGENOUS_SUBCATEGORY,
       radius: $("#program-radius").val() || "0",
-      postalCode: $("input#postalCode").val() || "",
+      postalCode: $.trim($("input#postalCode").val() || ""),
     };
   }
 
@@ -249,11 +249,8 @@
     return isIndigenousOnlyMode() && getIndigenousProgramsDataBase() !== null;
   }
 
-  /** Static Indigenous snapshots: map/province + national browse; postal/distance need live API. */
+  /** Static Indigenous snapshots: province/national browse at Full Prov/Terr (postal is display-only). Live API for distance radius. */
   function indigenousResultsCanUseStaticSnapshot(data) {
-    if (data.postalCode) {
-      return false;
-    }
     if (data.page) {
       return false;
     }
@@ -423,39 +420,143 @@
     });
   }
 
+  /** Map widget payload to About Grief Umbraco POST names (dual keys — matches their form + legacy binders). */
+  function toAboutGriefPostData(data) {
+    data = data || {};
+    var loc = typeof data.location === "string" ? data.location : "";
+    var cat = typeof data.category === "string" ? data.category : "";
+    var sub = typeof data.subcategory === "string" ? data.subcategory : "";
+    var rad =
+      data.radius != null && data.radius !== "" ? String(data.radius) : "0";
+    var pc = typeof data.postalCode === "string" ? $.trim(data.postalCode) : "";
+    var payload = {
+      SelectedLocation: loc,
+      SelectedCategory: cat,
+      SelectedSubcategory: sub,
+      SelectedRadius: rad,
+      postalCode: pc,
+      location: loc,
+      category: cat,
+      subcategory: sub,
+      radius: rad,
+    };
+    if (data.page) {
+      payload.page = data.page;
+    }
+    return payload;
+  }
+
+  function isProgramsPostFragmentEmpty(fragment) {
+    if (fragment == null) {
+      return true;
+    }
+    var s = String(fragment);
+    if (!$.trim(s)) {
+      return true;
+    }
+    return (
+      s.indexOf("program-service__lists") < 0 &&
+      s.indexOf("program-service__title") < 0
+    );
+  }
+
+  /** Full-page POST omits list markup for national + audience unless we send location=Canada. */
+  function payloadForCrossOriginFallback(postData) {
+    var o = $.extend({}, postData);
+    var sub = $.trim(o.subcategory || o.SelectedSubcategory || "");
+    var loc = $.trim(o.location || o.SelectedLocation || "");
+    if (sub !== "" && loc === "") {
+      o.location = "Canada";
+      o.SelectedLocation = "Canada";
+    }
+    return o;
+  }
+
+  function programsPostFetch(postData, withXHRHeader) {
+    var headers = {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    };
+    if (withXHRHeader) {
+      headers["X-Requested-With"] = "XMLHttpRequest";
+    }
+    return fetch(API_PAGE, {
+      method: "POST",
+      mode: "cors",
+      credentials: "omit",
+      headers: headers,
+      body: $.param(postData, true),
+    }).then(function (response) {
+      if (!response.ok) {
+        var err = new Error("http");
+        err.status = response.status;
+        return response.text().then(function (text) {
+          err.responseText = text;
+          throw err;
+        });
+      }
+      return response.text();
+    });
+  }
+
   function fetchResultsFromAboutGriefApi(data, scrollToResults) {
-    $.ajax({
-      url: API_PAGE,
-      type: "POST",
-      crossDomain: true,
-      headers: { "X-Requested-With": "XMLHttpRequest" },
-      data: data,
-      traditional: true,
-      success: function (result) {
+    var postData = toAboutGriefPostData(data);
+    var didFallbackAttempt = false;
+
+    function showProgramsAjaxError() {
+      $("#results-container").html(
+        '<p class="lmc-loading lmc-loading--error">Unable to load results. Try again later.</p>'
+      );
+    }
+
+    function trySimplePostFallback() {
+      if (didFallbackAttempt) {
+        showProgramsAjaxError();
+        return;
+      }
+      didFallbackAttempt = true;
+      programsPostFetch(payloadForCrossOriginFallback(postData), false)
+        .then(function (result) {
+          var fragment = extractResultsFragment(result);
+          if (fragment === null || isProgramsPostFragmentEmpty(fragment)) {
+            showProgramsAjaxError();
+            return;
+          }
+          renderResultsHtml(
+            absolutizeAboutGriefMediaInHtml(fragment),
+            scrollToResults
+          );
+        })
+        .catch(showProgramsAjaxError);
+    }
+
+    programsPostFetch(postData, true)
+      .then(function (result) {
         var fragment = extractResultsFragment(result);
         if (fragment === null) {
-          $("#results-container").html(
-            '<p class="lmc-loading lmc-loading--error">Unable to parse results from the server response.</p>'
-          );
+          trySimplePostFallback();
           return;
         }
-        renderResultsHtml(absolutizeAboutGriefMediaInHtml(fragment), scrollToResults);
-      },
-      error: function (xhr) {
+        if (isProgramsPostFragmentEmpty(fragment)) {
+          trySimplePostFallback();
+          return;
+        }
+        renderResultsHtml(
+          absolutizeAboutGriefMediaInHtml(fragment),
+          scrollToResults
+        );
+      })
+      .catch(function (err) {
         if (
-          xhr.status === 500 &&
-          xhr.responseText &&
-          xhr.responseText.indexOf("Google Geolocation API key") >= 0
+          err.status === 500 &&
+          err.responseText &&
+          err.responseText.indexOf("Google Geolocation API key") >= 0
         ) {
           window.alert(
             "Please check the validity of Google Geolocation API key."
           );
         }
-        $("#results-container").html(
-          '<p class="lmc-loading lmc-loading--error">Unable to load results. Try again later.</p>'
-        );
-      },
-    });
+        trySimplePostFallback();
+      });
   }
 
   window.refreshResults = function (data, scrollToResults) {
