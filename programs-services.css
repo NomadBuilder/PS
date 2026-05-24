@@ -852,3 +852,17 @@ a:hover {
   }
 }
 
+/* Indigenous-only embed: audience locked to Indigenous; “Who is it for” hidden; no submit CTA. */
+.lmc-programs-indigenous-only .lmc-programs-hero__lead {
+  max-width: 42rem;
+}
+
+.lmc-programs-indigenous-only .lmc-indigenous-hide-audience,
+.lmc-indigenous-hide-field {
+  display: none !important;
+}
+
+.lmc-programs-indigenous-only .lmc-map-hint {
+  margin-top: 0.5rem;
+}
+

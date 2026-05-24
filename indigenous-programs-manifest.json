@@ -1,0 +1,18 @@
+{
+  "description": "Indigenous-only program listing snapshots from IndigenousPrograms.html. Keys match #program-location / map data-location.",
+  "fragments": {
+    "": "indigenous-fragments/indigenous-canada.html",
+    "Alberta": "indigenous-fragments/indigenous-alberta.html",
+    "British Columbia": "indigenous-fragments/indigenous-british-columbia.html",
+    "Manitoba": "indigenous-fragments/indigenous-manitoba.html",
+    "New Brunswick": "indigenous-fragments/indigenous-new-brunswick.html",
+    "Newfoundland and Labrador": "indigenous-fragments/indigenous-newfoundland-and-labrador.html",
+    "Northwest Territories": "indigenous-fragments/indigenous-northwest-territories.html",
+    "Nunavut": "indigenous-fragments/indigenous-nunavut.html",
+    "Ontario": "indigenous-fragments/indigenous-ontario.html",
+    "Prince Edward Island": "indigenous-fragments/indigenous-prince-edward-island.html",
+    "Quebec": "indigenous-fragments/indigenous-quebec.html",
+    "Saskatchewan": "indigenous-fragments/indigenous-saskatchewan.html",
+    "Yukon": "indigenous-fragments/indigenous-yukon.html"
+  }
+}

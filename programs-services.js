@@ -3,9 +3,197 @@
   var API_CATEGORIES =
     "https://aboutgrief.ca/umbraco/Surface/GriefContent/UpdateCategories";
   var ABOUT_GRIEF_ORIGIN = "https://aboutgrief.ca";
+  var INDIGENOUS_SUBCATEGORY = "Indigenous";
 
   var manifestPromise = null;
-  var liveFormRefreshTimer = null;
+  var indigenousManifestPromise = null;
+
+  function getProgramsScriptEl() {
+    return document.querySelector("script[src*='programs-services.js']");
+  }
+
+  /** Dedicated Indigenous listing: same data as aboutgrief.ca ?subcategory=Indigenous (no search UI; redundant audience labels stripped). */
+  function isIndigenousOnlyMode() {
+    if (typeof window.LMC_PROGRAMS_MODE === "string") {
+      if ($.trim(window.LMC_PROGRAMS_MODE).toLowerCase() === "indigenous-only") {
+        return true;
+      }
+    }
+    var el = getProgramsScriptEl();
+    if (el) {
+      var m = el.getAttribute("data-lmc-programs-mode");
+      if (m && $.trim(m).toLowerCase() === "indigenous-only") {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function lockedSubcategory() {
+    return isIndigenousOnlyMode() ? INDIGENOUS_SUBCATEGORY : null;
+  }
+
+  function indigenousNationalPayload() {
+    return {
+      location: "",
+      category: "",
+      subcategory: INDIGENOUS_SUBCATEGORY,
+      radius: "0",
+      postalCode: "",
+    };
+  }
+
+  /** Indigenous-only: province (map-linked), postal code, and distance — audience always Indigenous. */
+  function indigenousSearchPayloadFromForm() {
+    return {
+      location: $("#program-location").val() || "",
+      category: "",
+      subcategory: INDIGENOUS_SUBCATEGORY,
+      radius: $("#program-radius").val() || "0",
+      postalCode: $("input#postalCode").val() || "",
+    };
+  }
+
+  function injectIndigenousSearchForm() {
+    var provinces =
+      '<option value="">Canada</option>' +
+      '<option value="Alberta">Alberta</option>' +
+      '<option value="British Columbia">British Columbia</option>' +
+      '<option value="Manitoba">Manitoba</option>' +
+      '<option value="New Brunswick">New Brunswick</option>' +
+      '<option value="Newfoundland and Labrador">Newfoundland and Labrador</option>' +
+      '<option value="Prince Edward Island">Prince Edward Island</option>' +
+      '<option value="Nova Scotia">Nova Scotia</option>' +
+      '<option value="Quebec">Quebec</option>' +
+      '<option value="Ontario">Ontario</option>' +
+      '<option value="Saskatchewan">Saskatchewan</option>' +
+      '<option value="Yukon">Yukon</option>' +
+      '<option value="Northwest Territories">Northwest Territories</option>' +
+      '<option value="Nunavut">Nunavut</option>';
+
+    $("#search-container").html(
+      '<div class="program-service__form lmc-indigenous-search-form">' +
+        '<form id="programs-services-form" action="#">' +
+        '<input type="hidden" id="program-category" name="category" value="" />' +
+        '<select id="program-subcategory" name="subcategory" hidden aria-hidden="true" tabindex="-1">' +
+        '<option value="' +
+        INDIGENOUS_SUBCATEGORY +
+        '" selected>' +
+        INDIGENOUS_SUBCATEGORY +
+        "</option></select>" +
+        '<div class="form-block">' +
+        '<div class="form-block__item">' +
+        '<label for="program-location">Province/Territory</label>' +
+        '<div class="input-block">' +
+        '<select class="form-select form-input js-provinces item-code" id="program-location" name="location">' +
+        provinces +
+        "</select></div></div></div>" +
+        '<div class="form-block">' +
+        '<div class="form-block__item">' +
+        '<label for="postalCode">Postal code</label>' +
+        '<div class="input-block">' +
+        '<input id="postalCode" name="postalCode" type="text" placeholder="e.g. M5V 1J2" class="form-input js-provinces item-code" autocomplete="postal-code" />' +
+        "</div></div>" +
+        '<div class="form-block__item">' +
+        '<label for="program-radius">Distance</label>' +
+        '<select class="form-select" id="program-radius" name="radius">' +
+        '<option value="20">20 km</option>' +
+        '<option value="50">50 km</option>' +
+        '<option value="100">100 km</option>' +
+        '<option value="250">250 km</option>' +
+        '<option selected="selected" value="0">Full prov/terr</option>' +
+        "</select></div></div>" +
+        '<div class="form-buttons-container">' +
+        '<div class="input-block">' +
+        '<button id="submit" type="submit" class="form-submit">Search&nbsp;<i class="fas fa-angle-right"></i></button>' +
+        "</div>" +
+        '<div class="input-block">' +
+        '<button id="reset" type="button" class="program-reset">Reset</button>' +
+        "</div></div></form></div>"
+    );
+  }
+
+  /** Legacy: hide audience/type if an About Grief form fragment was injected. */
+  function applyIndigenousOnlySearchFormLock() {
+    if (!isIndigenousOnlyMode()) {
+      return;
+    }
+    $("#program-category")
+      .closest(".form-block__item")
+      .addClass("lmc-indigenous-hide-field")
+      .attr("aria-hidden", "true");
+    var $sub = $("#program-subcategory");
+    if (!$sub.length) {
+      return;
+    }
+    $sub.val(INDIGENOUS_SUBCATEGORY);
+    $sub.closest(".form-block__item")
+      .addClass("lmc-indigenous-hide-field")
+      .attr("aria-hidden", "true");
+    $("#search-container label").each(function () {
+      var t = $.trim($(this).text());
+      if (/who\s+is\s+it\s+for|^type$/i.test(t)) {
+        $(this)
+          .closest(".form-block__item")
+          .addClass("lmc-indigenous-hide-field")
+          .attr("aria-hidden", "true");
+      }
+    });
+  }
+
+  /** @deprecated use injectIndigenousSearchForm */
+  function injectIndigenousSearchStub() {
+    $("#search-container").html(
+      '<form id="programs-services-form" class="lmc-indigenous-stub-form" aria-hidden="true" tabindex="-1">' +
+        '<input type="hidden" id="program-location" name="location" value="" />' +
+        '<input type="hidden" id="program-category" name="category" value="" />' +
+        '<select id="program-subcategory" name="subcategory" hidden>' +
+        '<option value="' +
+        INDIGENOUS_SUBCATEGORY +
+        '" selected>' +
+        INDIGENOUS_SUBCATEGORY +
+        "</option>" +
+        "</select>" +
+        '<select id="program-radius" name="radius" hidden>' +
+        '<option value="0" selected>0</option>' +
+        "</select>" +
+        '<input type="hidden" id="postalCode" name="postalCode" value="" />' +
+        "</form>"
+    );
+  }
+
+  /**
+   * Server HTML repeats audience under each service type (h4 "Indigenous"). For this view the page is already scoped to Indigenous.
+   */
+  function postProcessIndigenousOnlyResultsHtml() {
+    var $c = $("#results-container");
+    if (!$c.length) {
+      return;
+    }
+    $c.find(".faq__items-sub > h4").each(function () {
+      var t = $.trim($(this).text());
+      if (t.toLowerCase() === INDIGENOUS_SUBCATEGORY.toLowerCase()) {
+        $(this).remove();
+      }
+    });
+    var $intro = $c.find("p.mb-20").first();
+    if ($intro.length && /showing results/i.test($intro.text())) {
+      var loc = $.trim($("#program-location").val() || "");
+      var pc = $.trim($("input#postalCode").val() || "");
+      var rad = $("#program-radius").val() || "0";
+      var place = loc
+        ? " in <b>" + $("<span/>").text(loc).html() + "</b>"
+        : " across <b>Canada</b>";
+      var msg = "Indigenous programs and services" + place;
+      if (pc && rad && rad !== "0") {
+        msg += " within <b>" + $("<span/>").text(rad).html() + " km</b> of <b>" + $("<span/>").text(pc).html() + "</b>";
+      } else if (pc) {
+        msg += " near <b>" + $("<span/>").text(pc).html() + "</b>";
+      }
+      $intro.html("<i>" + msg + ".</i>");
+    }
+    $c.find(".click-text.display-grief").remove();
+  }
 
   /**
    * Listings use root-relative URLs (/Assets/..., /media/...). On LMC or GitHub
@@ -40,32 +228,61 @@
     return getProgramsDataBase() !== null;
   }
 
-  /**
-   * Static fragments are keyed by location only (see programs-manifest.json).
-   * Subcategory / category / postal / radius filters must use the live About Grief
-   * POST endpoint or filtered searches (e.g. Indigenous) show the wrong cached HTML.
-   */
-  function hasActiveResultFilters(data) {
-    if (!data || typeof data !== "object") {
+  function getIndigenousProgramsDataBase() {
+    var w = window.LMC_INDIGENOUS_PROGRAMS_DATA_BASE;
+    if (w && typeof w === "string" && $.trim(w) !== "") {
+      return w.replace(/\/?$/, "/");
+    }
+    var el = getProgramsScriptEl();
+    if (el) {
+      var b = el.getAttribute("data-lmc-indigenous-programs-static-base");
+      if (b && $.trim(b) !== "") {
+        return b.replace(/\/?$/, "/");
+      }
+    }
+    return null;
+  }
+
+  function useStaticIndigenousProgramsData() {
+    return isIndigenousOnlyMode() && getIndigenousProgramsDataBase() !== null;
+  }
+
+  /** Static Indigenous snapshots: map/province + national browse; postal/distance need live API. */
+  function indigenousResultsCanUseStaticSnapshot(data) {
+    if (data.postalCode) {
       return false;
     }
-    var sub = (data.subcategory && String(data.subcategory).trim()) || "";
-    var cat = (data.category && String(data.category).trim()) || "";
-    var pc = (data.postalCode && String(data.postalCode).trim()) || "";
-    if (sub || cat || pc) {
-      return true;
+    if (data.page) {
+      return false;
     }
-    var r =
-      data.radius !== undefined && data.radius !== null
-        ? String(data.radius).trim()
-        : "";
-    if (r && r !== "0") {
-      return true;
+    var rad = data.radius || "0";
+    if (rad && rad !== "0") {
+      return false;
     }
-    if (data.page !== undefined && data.page !== null && String(data.page).trim() !== "") {
-      return true;
+    return true;
+  }
+
+  function useStaticProgramsData() {
+    return isStaticMode() && !isIndigenousOnlyMode();
+  }
+
+  function loadIndigenousManifest() {
+    var base = getIndigenousProgramsDataBase();
+    if (!base) {
+      return Promise.reject(new Error("no indigenous base"));
     }
-    return false;
+    if (indigenousManifestPromise) {
+      return indigenousManifestPromise;
+    }
+    indigenousManifestPromise = fetch(
+      base + "indigenous-programs-manifest.json"
+    ).then(function (r) {
+      if (!r.ok) {
+        throw new Error("indigenous manifest");
+      }
+      return r.json();
+    });
+    return indigenousManifestPromise;
   }
 
   function loadManifest() {
@@ -158,137 +375,6 @@
     };
   }
 
-  /** Postal field id/name varies slightly across exports; resolve one jQuery collection. */
-  function postalInput$() {
-    return $(
-      "#search-container input#postalCode, #search-container #postalCode, #search-container input[name='postalCode'], input#postalCode, #postalCode"
-    )
-      .filter("input")
-      .first();
-  }
-
-  function programsUrlParams() {
-    try {
-      return new URLSearchParams(window.location.search || "");
-    } catch (e) {
-      return new URLSearchParams();
-    }
-  }
-
-  /** Set <select> only if an option matches (avoids silent clears on typos in URL). */
-  function setSelectValueIfAllowed($select, raw) {
-    if (!$select.length) {
-      return;
-    }
-    var v = raw == null ? "" : String(raw);
-    var has = $select.find("option").filter(function () {
-      var $o = $(this);
-      var ov = $o.attr("value");
-      if (ov === undefined) {
-        return ($o.val() || "") === v;
-      }
-      return ov === v;
-    }).length;
-    if (has) {
-      $select.val(v);
-    }
-  }
-
-  /** Coerce POST body to strings the Umbraco surface expects; drop stray undefined. */
-  function normalizeProgramsPayload(data) {
-    var d = data && typeof data === "object" ? data : {};
-    var o = {
-      location: d.location != null ? String(d.location) : "",
-      category: d.category != null ? String(d.category) : "",
-      subcategory: d.subcategory != null ? String(d.subcategory) : "",
-      radius:
-        d.radius != null && String(d.radius).trim() !== ""
-          ? String(d.radius)
-          : "0",
-      postalCode: d.postalCode != null ? String(d.postalCode) : "",
-    };
-    if (d.page != null && String(d.page).trim() !== "") {
-      o.page = String(d.page).trim();
-    }
-    return o;
-  }
-
-  /**
-   * Apply ?location=&category=&… to the form.
-   * @param {boolean} applyDefaultsForAbsentKeys — if true (e.g. browser back/forward), reset fields whose keys are missing from the URL.
-   */
-  function syncProgramsFormFromUrl(applyDefaultsForAbsentKeys) {
-    applyDefaultsForAbsentKeys = !!applyDefaultsForAbsentKeys;
-    if (!window.location.search) {
-      if (applyDefaultsForAbsentKeys) {
-        $("#program-location").val("");
-        $("#program-category").val("");
-        $("#program-subcategory").val("");
-        $("#program-radius").val("0");
-        postalInput$().val("");
-      }
-      return;
-    }
-    var p = programsUrlParams();
-    if (!hasProgramsSearchParamsInUrl()) {
-      if (applyDefaultsForAbsentKeys) {
-        $("#program-location").val("");
-        $("#program-category").val("");
-        $("#program-subcategory").val("");
-        $("#program-radius").val("0");
-        postalInput$().val("");
-      }
-      return;
-    }
-    if (p.has("location")) {
-      setSelectValueIfAllowed($("#program-location"), p.get("location") || "");
-    } else if (applyDefaultsForAbsentKeys) {
-      $("#program-location").val("");
-    }
-    if (p.has("category")) {
-      setSelectValueIfAllowed($("#program-category"), p.get("category") || "");
-    } else if (applyDefaultsForAbsentKeys) {
-      $("#program-category").val("");
-    }
-    if (p.has("subcategory")) {
-      setSelectValueIfAllowed(
-        $("#program-subcategory"),
-        p.get("subcategory") || ""
-      );
-    } else if (applyDefaultsForAbsentKeys) {
-      $("#program-subcategory").val("");
-    }
-    if (p.has("radius")) {
-      setSelectValueIfAllowed($("#program-radius"), p.get("radius") || "0");
-    } else if (applyDefaultsForAbsentKeys) {
-      $("#program-radius").val("0");
-    }
-    if (p.has("postalCode")) {
-      postalInput$().val(p.get("postalCode") || "");
-    } else if (applyDefaultsForAbsentKeys) {
-      postalInput$().val("");
-    }
-  }
-
-  function resultsPayloadFromForm() {
-    var o = {
-      location: $("#program-location").val() || "",
-      category: $("#program-category").val() || "",
-      subcategory: $("#program-subcategory").val() || "",
-      radius: $("#program-radius").val() || "0",
-      postalCode: (postalInput$().val() || "").trim(),
-    };
-    var p = programsUrlParams();
-    if (p.has("page") && p.get("page")) {
-      o.page = p.get("page");
-    }
-    return normalizeProgramsPayload(o);
-  }
-
-  function escapeForUrlQueryKey(key) {
-    return String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  }
-
   function updateQueryString(key, value) {
     var baseUrl = [
       location.protocol,
@@ -301,9 +387,7 @@
     var params = "?" + newParam;
 
     if (urlQueryString) {
-      var keyRegex = new RegExp(
-        "([?&])" + escapeForUrlQueryKey(key) + "=[^&]*"
-      );
+      var keyRegex = new RegExp("([?&])" + key + "[^&]*");
       if (urlQueryString.match(keyRegex) !== null) {
         params = urlQueryString.replace(keyRegex, "$1" + newParam);
       } else {
@@ -313,31 +397,77 @@
     window.history.replaceState({}, "", baseUrl + params);
   }
 
-  function removeQueryStringKey(key) {
-    var baseUrl = [
-      location.protocol,
-      "//",
-      location.host,
-      location.pathname,
-    ].join("");
-    var p = programsUrlParams();
-    p.delete(key);
-    var next = p.toString();
-    window.history.replaceState({}, "", baseUrl + (next ? "?" + next : ""));
+  function renderResultsHtml(html, scrollToResults) {
+    $("#results-container").html(html);
+    enhanceNationalDefaultView();
+    if (isIndigenousOnlyMode()) {
+      postProcessIndigenousOnlyResultsHtml();
+    }
+    if (scrollToResults) {
+      scrollResultsIntoView();
+    }
+  }
+
+  function fetchStaticResultsFragment(base, manifest, loc) {
+    var fr = manifest.fragments || {};
+    if (!Object.prototype.hasOwnProperty.call(fr, loc)) {
+      return Promise.reject(new Error("no fragment"));
+    }
+    return fetch(base + fr[loc]).then(function (r) {
+      if (!r.ok) {
+        throw new Error("fragment");
+      }
+      return r.text();
+    });
+  }
+
+  function fetchResultsFromAboutGriefApi(data, scrollToResults) {
+    $.ajax({
+      url: API_PAGE,
+      type: "POST",
+      crossDomain: true,
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+      data: data,
+      traditional: true,
+      success: function (result) {
+        var fragment = extractResultsFragment(result);
+        if (fragment === null) {
+          $("#results-container").html(
+            '<p class="lmc-loading lmc-loading--error">Unable to parse results from the server response.</p>'
+          );
+          return;
+        }
+        renderResultsHtml(absolutizeAboutGriefMediaInHtml(fragment), scrollToResults);
+      },
+      error: function (xhr) {
+        if (
+          xhr.status === 500 &&
+          xhr.responseText &&
+          xhr.responseText.indexOf("Google Geolocation API key") >= 0
+        ) {
+          window.alert(
+            "Please check the validity of Google Geolocation API key."
+          );
+        }
+        $("#results-container").html(
+          '<p class="lmc-loading lmc-loading--error">Unable to load results. Try again later.</p>'
+        );
+      },
+    });
   }
 
   window.refreshResults = function (data, scrollToResults) {
     scrollToResults = !!scrollToResults;
-    data = normalizeProgramsPayload(data);
+    data = data ? $.extend({}, data) : {};
+    if (lockedSubcategory()) {
+      data.subcategory = lockedSubcategory();
+    }
 
     $("#results-container").html(
       '<p class="lmc-loading" role="status">Loading programs…</p>'
     );
 
-    var useStaticFragment =
-      isStaticMode() && !hasActiveResultFilters(data);
-
-    if (useStaticFragment) {
+    if (useStaticProgramsData()) {
       var base = getProgramsDataBase();
       var loc = typeof data.location === "string" ? data.location : "";
       loadManifest()
@@ -357,14 +487,10 @@
           });
         })
         .then(function (text) {
-          var html = absolutizeAboutGriefMediaInHtml(
-            applyResultsFragmentText(text)
+          renderResultsHtml(
+            absolutizeAboutGriefMediaInHtml(applyResultsFragmentText(text)),
+            scrollToResults
           );
-          $("#results-container").html(html);
-          enhanceNationalDefaultView();
-          if (scrollToResults) {
-            scrollResultsIntoView();
-          }
         })
         .catch(function () {
           $("#results-container").html(
@@ -374,110 +500,48 @@
       return;
     }
 
-    function programsPostAjax(postData, withXHRHeader) {
-      var opts = {
-        url: API_PAGE,
-        type: "POST",
-        crossDomain: true,
-        data: postData,
-        traditional: true,
-      };
-      /* About Grief returns the real results fragment only with this header (same as their
-         Common.js). Cross-origin browsers may block that header (CORS preflight). */
-      if (withXHRHeader) {
-        opts.headers = { "X-Requested-With": "XMLHttpRequest" };
-      }
-      return $.ajax(opts);
-    }
-
-    function isProgramsPostFragmentEmpty(fragment) {
-      if (fragment == null) {
-        return true;
-      }
-      var s = String(fragment);
-      if (!$.trim(s)) {
-        return true;
-      }
-      return (
-        s.indexOf("program-service__lists") < 0 &&
-        s.indexOf("program-service__title") < 0
-      );
-    }
-
-    /** Full-page POST omits list markup for national + audience unless we send location=Canada. */
-    function payloadForCrossOriginFallback(postData) {
-      var o = $.extend({}, postData);
-      if ($.trim(o.subcategory) !== "" && $.trim(o.location) === "") {
-        o.location = "Canada";
-      }
-      return o;
-    }
-
-    function renderProgramsFragment(fragment) {
-      $("#results-container").html(absolutizeAboutGriefMediaInHtml(fragment));
-      enhanceNationalDefaultView();
-      if (scrollToResults) {
-        scrollResultsIntoView();
-      }
-    }
-
-    function showProgramsAjaxError() {
-      $("#results-container").html(
-        '<p class="lmc-loading lmc-loading--error">Unable to load results. Try again later.</p>'
-      );
-    }
-
-    var didFallbackAttempt = false;
-    function trySimplePostFallback() {
-      if (didFallbackAttempt) {
-        showProgramsAjaxError();
-        return;
-      }
-      didFallbackAttempt = true;
-      var fb = payloadForCrossOriginFallback(data);
-      programsPostAjax(fb, false)
-        .done(function (result) {
-          var fragment = extractResultsFragment(result);
-          if (fragment === null || isProgramsPostFragmentEmpty(fragment)) {
-            showProgramsAjaxError();
-            return;
-          }
-          renderProgramsFragment(fragment);
+    if (
+      useStaticIndigenousProgramsData() &&
+      indigenousResultsCanUseStaticSnapshot(data)
+    ) {
+      var indBase = getIndigenousProgramsDataBase();
+      var indLoc = typeof data.location === "string" ? data.location : "";
+      loadIndigenousManifest()
+        .then(function (manifest) {
+          return fetchStaticResultsFragment(indBase, manifest, indLoc);
         })
-        .fail(function () {
-          showProgramsAjaxError();
+        .then(function (text) {
+          renderResultsHtml(
+            absolutizeAboutGriefMediaInHtml(applyResultsFragmentText(text)),
+            scrollToResults
+          );
+        })
+        .catch(function () {
+          fetchResultsFromAboutGriefApi(data, scrollToResults);
         });
+      return;
     }
 
-    programsPostAjax(data, true)
-      .done(function (result) {
-        var fragment = extractResultsFragment(result);
-        if (fragment === null) {
-          trySimplePostFallback();
-          return;
-        }
-        if (!isProgramsPostFragmentEmpty(fragment)) {
-          renderProgramsFragment(fragment);
-          return;
-        }
-        trySimplePostFallback();
-      })
-      .fail(function (xhr) {
-        if (
-          xhr.status === 500 &&
-          xhr.responseText &&
-          xhr.responseText.indexOf("Google Geolocation API key") >= 0
-        ) {
-          window.alert(
-            "Please check the validity of Google Geolocation API key."
-          );
-        }
-        trySimplePostFallback();
-      });
+    fetchResultsFromAboutGriefApi(data, scrollToResults);
   };
 
   window.refreshCategories = function (data) {
-    if (isStaticMode()) {
+    data = data ? $.extend({}, data) : {};
+    if (lockedSubcategory()) {
+      data.subcategory = lockedSubcategory();
+    }
+
+    if (isIndigenousOnlyMode()) {
+      var indLoc =
+        typeof data.location === "string" ? data.location : "";
+      $("#program-location").val(indLoc);
+      updateQueryString("location", indLoc || "");
+      updateQueryString("subcategory", INDIGENOUS_SUBCATEGORY);
+      refreshResults(indigenousSearchPayloadFromForm(), true);
+      return;
+    }
+
+    if (useStaticProgramsData()) {
       var loc =
         typeof data.location === "string" ? data.location : "";
       $("#program-location").val(loc);
@@ -500,13 +564,13 @@
       if (typeof data.postalCode !== "undefined") {
         next.postalCode = data.postalCode;
       } else {
-        next.postalCode = (postalInput$().val() || "").trim();
+        next.postalCode = $("input#postalCode").val() || "";
       }
 
       updateQueryString("category", category || "");
       updateQueryString("subcategory", subcategory || "");
 
-      refreshResults(normalizeProgramsPayload(next), true);
+      refreshResults(next, true);
       return;
     }
 
@@ -516,6 +580,7 @@
       data: data,
       success: function (result) {
         $("#search-container").html(result);
+        applyIndigenousOnlySearchFormLock();
 
         var category = $("#program-category").val();
         var subcategory = $("#program-subcategory").val();
@@ -534,13 +599,13 @@
         if (typeof data.postalCode !== "undefined") {
           next.postalCode = data.postalCode;
         } else {
-          next.postalCode = (postalInput$().val() || "").trim();
+          next.postalCode = $("input#postalCode").val() || "";
         }
 
         updateQueryString("category", category || "");
         updateQueryString("subcategory", subcategory || "");
 
-        refreshResults(normalizeProgramsPayload(next), true);
+        refreshResults(next, true);
       },
       error: function () {
         $("#search-container").html(
@@ -594,49 +659,41 @@
   }
 
   function setProvinceFromPostalCode() {
-    var $in = postalInput$();
-    if (!$in.length) {
-      return;
-    }
-    var postalCode = ($in.val() || "").trim();
+    var postalCode = $("#postalCode").val().trim();
     var province = getProvinceByPostalCode(postalCode);
     if (province) {
-      setSelectValueIfAllowed($("#program-location"), province);
+      $("#program-location").val(province);
     }
   }
 
-  /**
-   * If the URL already carries programs filters (e.g. subcategory=Indigenous&location=),
-   * do not infer postal/location from IP — that would overwrite national "Canada" and break
-   * audience-only searches after syncProgramsFormFromUrl().
-   */
-  function hasProgramsSearchParamsInUrl() {
-    if (!window.location.search) {
-      return false;
+  function syncStubFieldsFromUrl() {
+    if (!isIndigenousOnlyMode()) {
+      return;
     }
-    var keys = [
-      "location",
-      "category",
-      "subcategory",
-      "postalCode",
-      "radius",
-      "page",
-    ];
-    var p = programsUrlParams();
-    for (var i = 0; i < keys.length; i++) {
-      if (p.has(keys[i])) {
-        return true;
+    try {
+      var q = new URLSearchParams(window.location.search || "");
+      var loc = q.get("location");
+      if (loc !== null && $("#program-location").length) {
+        $("#program-location").val(loc);
       }
-    }
-    return false;
+      var cat = q.get("category");
+      if (cat !== null && $("#program-category").length) {
+        $("#program-category").val(cat);
+      }
+      var pc = q.get("postalCode");
+      if (pc !== null && $("input#postalCode").length) {
+        $("input#postalCode").val(pc);
+      }
+      var rad = q.get("radius");
+      if (rad !== null && rad !== "" && $("#program-radius").length) {
+        $("#program-radius").val(rad);
+      }
+    } catch (err) {}
   }
 
   function tryAutofillPostalFromIp() {
-    if (hasProgramsSearchParamsInUrl()) {
-      return;
-    }
-    var postalCodeInput = postalInput$();
-    if (!postalCodeInput.length || (postalCodeInput.val() || "").trim() !== "") {
+    var postalCodeInput = $("input#postalCode");
+    if (!postalCodeInput.length || postalCodeInput.val() !== "") {
       return;
     }
 
@@ -672,7 +729,13 @@
 
       $("#program-location").val(selectedLocation);
       updateQueryString("location", selectedLocation || "");
-      updateQueryString("category", selectedCategory || "");
+
+      if (isIndigenousOnlyMode()) {
+        updateQueryString("subcategory", INDIGENOUS_SUBCATEGORY);
+        refreshResults(indigenousSearchPayloadFromForm(), true);
+        return;
+      }
+
       updateQueryString("subcategory", selectedSubcategory || "");
 
       refreshCategories({
@@ -690,22 +753,46 @@
 
     $(document).on("click", "#submit", function (e) {
       e.preventDefault();
-      var payload = resultsPayloadFromForm();
-      delete payload.page;
+      var location = $("#program-location").val() || "";
+      var category = $("#program-category").val() || "";
+      var subcategory = $("#program-subcategory").val() || "";
+      var radius = $("#program-radius").val() || "0";
+      var postalCode = $("input#postalCode").val() || "";
 
-      updateQueryString("location", payload.location);
-      updateQueryString("category", payload.category);
-      updateQueryString("subcategory", payload.subcategory);
-      updateQueryString("radius", payload.radius);
-      updateQueryString("postalCode", payload.postalCode);
-      removeQueryStringKey("page");
+      updateQueryString("location", location);
+      updateQueryString("category", category);
+      updateQueryString("subcategory", subcategory);
+      updateQueryString("radius", radius);
+      updateQueryString("postalCode", postalCode);
 
-      refreshResults(payload, true);
+      refreshResults(
+        {
+          location: location,
+          category: category,
+          subcategory: subcategory,
+          radius: radius,
+          postalCode: postalCode,
+        },
+        true
+      );
     });
 
     $(document).on("click", "#reset", function (e) {
       e.preventDefault();
-      removeQueryStringKey("page");
+      if (isIndigenousOnlyMode()) {
+        updateQueryString("location", "");
+        updateQueryString("category", "");
+        updateQueryString("subcategory", INDIGENOUS_SUBCATEGORY);
+        updateQueryString("radius", "0");
+        updateQueryString("postalCode", "");
+        $("#program-location").val("");
+        $("#program-category").val("");
+        $("#program-subcategory").val(INDIGENOUS_SUBCATEGORY);
+        $("#program-radius").val("0");
+        $("input#postalCode").val("");
+        refreshResults(indigenousNationalPayload(), true);
+        return;
+      }
       updateQueryString("location", "");
       updateQueryString("category", "");
       updateQueryString("subcategory", "");
@@ -716,62 +803,30 @@
       $("#program-category").val("");
       $("#program-subcategory").val("");
       $("#program-radius").val("0");
-      postalInput$().val("");
+      $("input#postalCode").val("");
       refreshResults(nationalSearchPayload(), true);
     });
 
-    $(document).on(
-      "change blur",
-      "#search-container #postalCode, #search-container input[name='postalCode'], input#postalCode, #postalCode",
-      function () {
-        setProvinceFromPostalCode();
-      }
-    );
+    $(document).on("change blur", "#postalCode", function () {
+      setProvinceFromPostalCode();
+    });
 
     $(document).on("click", "#pagination_button", function (e) {
       e.preventDefault();
       var page = $(this).attr("data-page");
       updateQueryString("page", page || "");
-      refreshResults(resultsPayloadFromForm(), true);
+      refreshResults(
+        {
+          page: page,
+          location: $("#program-location").val() || "",
+          category: $("#program-category").val() || "",
+          subcategory: $("#program-subcategory").val() || "",
+          radius: $("#program-radius").val() || "0",
+          postalCode: $("input#postalCode").val() || "",
+        },
+        true
+      );
     });
-
-    $(document).on(
-      "change",
-      "#search-container #program-subcategory, #search-container #program-category, #search-container #program-location",
-      function () {
-        if (isStaticMode()) {
-          return;
-        }
-        clearTimeout(liveFormRefreshTimer);
-        liveFormRefreshTimer = setTimeout(function () {
-          if (!$("#program-location").length) {
-            return;
-          }
-          var location = $("#program-location").val() || "";
-          var category = $("#program-category").val() || "";
-          var subcategory = $("#program-subcategory").val() || "";
-          updateQueryString("location", location);
-          updateQueryString("category", category);
-          updateQueryString("subcategory", subcategory);
-          $.ajax({
-            type: "GET",
-            url: API_CATEGORIES,
-            data: {
-              location: location,
-              category: category,
-              subcategory: subcategory,
-              lang: "en-US",
-            },
-            success: function (result) {
-              $("#search-container").html(result);
-              setSelectValueIfAllowed($("#program-location"), location);
-              setSelectValueIfAllowed($("#program-category"), category);
-              setSelectValueIfAllowed($("#program-subcategory"), subcategory);
-            },
-          });
-        }, 280);
-      }
-    );
 
     $(document).on(
       "click",
@@ -825,11 +880,24 @@
   }
 
   function initCategoriesAndResults() {
+    if (isIndigenousOnlyMode()) {
+      injectIndigenousSearchForm();
+      syncStubFieldsFromUrl();
+      tryAutofillPostalFromIp();
+      updateQueryString("subcategory", INDIGENOUS_SUBCATEGORY);
+      var payload = indigenousSearchPayloadFromForm();
+      updateQueryString("location", payload.location || "");
+      updateQueryString("radius", payload.radius || "0");
+      updateQueryString("postalCode", payload.postalCode || "");
+      refreshResults(payload, false);
+      return;
+    }
+
     $("#search-container").html(
       '<p class="lmc-loading" role="status">Loading search…</p>'
     );
 
-    if (isStaticMode()) {
+    if (useStaticProgramsData()) {
       var base = getProgramsDataBase();
       loadManifest()
         .then(function (manifest) {
@@ -846,9 +914,8 @@
         })
         .then(function (html) {
           $("#search-container").html(html);
-          syncProgramsFormFromUrl();
           tryAutofillPostalFromIp();
-          refreshResults(resultsPayloadFromForm(), false);
+          refreshResults(nationalSearchPayload());
         })
         .catch(function () {
           $("#search-container").html(
@@ -858,34 +925,18 @@
       return;
     }
 
-    var initCat = {
-      location: "",
-      category: "",
-      subcategory: "",
-      lang: "en-US",
-    };
-    if (window.location.search) {
-      var up = programsUrlParams();
-      if (up.has("location")) {
-        initCat.location = up.get("location") || "";
-      }
-      if (up.has("category")) {
-        initCat.category = up.get("category") || "";
-      }
-      if (up.has("subcategory")) {
-        initCat.subcategory = up.get("subcategory") || "";
-      }
-    }
-
     $.ajax({
       type: "GET",
       url: API_CATEGORIES,
-      data: initCat,
+      data: {
+        location: "",
+        category: "",
+        subcategory: "",
+        lang: "en-US",
+      },
       success: function (result) {
         $("#search-container").html(result);
-        syncProgramsFormFromUrl();
         tryAutofillPostalFromIp();
-        refreshResults(resultsPayloadFromForm(), false);
       },
       error: function () {
         $("#search-container").html(
@@ -893,19 +944,13 @@
         );
       },
     });
+
+    refreshResults(nationalSearchPayload());
   }
 
   $(function () {
     bindDelegatedUi();
     loadMapSvg();
     initCategoriesAndResults();
-
-    $(window).on("popstate", function () {
-      if (!$("#program-subcategory").length) {
-        return;
-      }
-      syncProgramsFormFromUrl(true);
-      refreshResults(resultsPayloadFromForm(), false);
-    });
   });
 })(jQuery);
