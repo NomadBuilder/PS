@@ -1,18 +1,8 @@
 <!--
-  GTM: Custom HTML tag — Indigenous-only programs widget.
-  Use a trigger that fires ONLY on the page(s) where you want this (not the same URL as the full widget).
+  GTM: Custom HTML tag — Indigenous programs & services widget (replaces the old full-audience widget).
 
-  Trigger (Page URL / Page Path — "matches RegEx"), copy the whole line:
-  idprograms.*[&?]services|services.*[&?]idprograms|[?&]idps(?:=|&|$|#)
-
-  That adds ?idps, &idps, ?idps=…, etc. to your existing idprograms/services query pairing.
-
-  Differences from gtm-custom-html.html:
-  - Root div includes lmc-programs-indigenous-only.
-  - Script tag includes data-lmc-programs-mode="indigenous-only" (locks API to Indigenous; strips redundant audience labels).
-  - Built-in search: province/territory (map-linked), postal code, and distance only — always Indigenous.
-  - Listings: static snapshots for map/national browse; postal/distance searches use aboutgrief.ca API (fallback if snapshot missing).
-  - “Submit a program or service” uses mailto:info@virtualhospice.ca (not Canadian Grief Alliance).
+  Keep your EXISTING trigger (e.g. culture landing + programs/services query in URL).
+  Replace the tag HTML with everything below the closing comment — do not add a second tag.
 
   Bump CSS_VER when you publish new programs-services.css to GitHub Pages.
 -->
@@ -58,7 +48,7 @@
 
     var center = findProgramsMountRoot();
     if (!center) {
-      console.warn("[LMC programs Indigenous] No mount root (.center) found; widget not mounted.");
+      console.warn("[LMC programs] No mount root (.center) found; widget not mounted.");
       return;
     }
     if (center.querySelector(".lmc-programs-gtm-root")) {
@@ -133,7 +123,7 @@
       if (opts.async) s.async = true;
       s.onload = onload || function () {};
       s.onerror = function () {
-        console.error("[LMC programs Indigenous] Failed to load", src);
+        console.error("[LMC programs] Failed to load", src);
       };
       document.head.appendChild(s);
     }
@@ -141,13 +131,13 @@
     function loadPrograms() {
       if (document.querySelector("script[data-lmc-programs-map]")) return;
       var s = document.createElement("script");
-      s.src = BASE + "programs-services.js";
+      s.src = BASE + "programs-services.js?v=" + CSS_VER;
       s.setAttribute("data-lmc-programs-map", BASE + "canada-map.svg");
       s.setAttribute("data-lmc-programs-mode", "indigenous-only");
       s.setAttribute("data-lmc-indigenous-programs-static-base", BASE);
       s.defer = true;
       s.onerror = function () {
-        console.error("[LMC programs Indigenous] Failed to load programs-services.js");
+        console.error("[LMC programs] Failed to load programs-services.js");
       };
       document.head.appendChild(s);
     }

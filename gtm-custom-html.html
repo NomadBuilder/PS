@@ -1,9 +1,16 @@
+<!--
+  GTM: Custom HTML tag — Indigenous programs & services widget (replaces the old full-audience widget).
+
+  Keep your EXISTING trigger (e.g. culture landing + programs/services query in URL).
+  Replace the tag HTML with everything below the closing comment — do not add a second tag.
+
+  Bump CSS_VER when you publish new programs-services.css to GitHub Pages.
+-->
 <script>
   (function () {
     var BASE = "https://nomadbuilder.github.io/PS/";
-    var CSS_VER = "6";
-    var JS_VER = "10";
-    window.LMC_PROGRAMS_DATA_BASE = BASE;
+    var CSS_VER = "7";
+    window.LMC_INDIGENOUS_PROGRAMS_DATA_BASE = BASE;
 
     function findProgramsMountRoot() {
       var list = document.querySelectorAll("div.center");
@@ -79,26 +86,26 @@
     ensureLink("stylesheet", BASE + "programs-services.css?v=" + CSS_VER);
 
     var WIDGET_HTML =
-      '<div class="lmc-programs-page lmc-programs-embed lmc-programs-gtm-root">' +
-      '<a class="lmc-skip" href="#program-service">Skip to search and results</a>' +
+      '<div class="lmc-programs-page lmc-programs-embed lmc-programs-gtm-root lmc-programs-indigenous-only">' +
+      '<a class="lmc-skip" href="#results-container">Skip to listings</a>' +
       '<main class="lmc-widget-main">' +
       '<header class="lmc-programs-hero" id="lmc-programs-hero">' +
-      '<h1 class="lmc-programs-hero__title">Programs and Services</h1>' +
-      '<p class="lmc-programs-hero__lead">Click on the map or use the search bar below.</p>' +
+      '<h1 class="lmc-programs-hero__title">Indigenous programs and services</h1>' +
+      '<p class="lmc-programs-hero__lead">Indigenous programs and services across Canada. Use the map, postal code, or distance to find resources — including national listings.</p>' +
       "</header>" +
       '<section class="lmc-map-section" aria-label="Canada map">' +
       '<div class="lmc-map-card">' +
       '<div id="map-root"></div>' +
-      '<p class="lmc-map-hint">Select a province or territory on the map to filter listings.</p>' +
+      '<p class="lmc-map-hint">Select a province or territory on the map to filter these Indigenous listings.</p>' +
       "</div>" +
       "</section>" +
       '<div id="program-service" class="program-service">' +
-      '<h2 class="h2">Search</h2>' +
+      '<h2 class="h2">Find programs near you</h2>' +
       '<div id="search-container"></div>' +
       '<div id="results-container" aria-live="polite"></div>' +
       '<div class="lmc-page-actions">' +
-      '<a href="#program-service" class="return-btn">Return to top</a>' +
-      '<a href="mailto:canadiangriefalliance@virtualhospice.ca" class="btn-more">Submit a program or service <i class="fas fa-chevron-right" aria-hidden="true"></i></a>' +
+      '<a href="#results-container" class="return-btn">Return to top</a>' +
+      '<a href="mailto:info@virtualhospice.ca" class="btn-more">Submit a program or service <i class="fas fa-chevron-right" aria-hidden="true"></i></a>' +
       "</div>" +
       "</div>" +
       "</main>" +
@@ -124,8 +131,10 @@
     function loadPrograms() {
       if (document.querySelector("script[data-lmc-programs-map]")) return;
       var s = document.createElement("script");
-      s.src = BASE + "programs-services.js?v=" + JS_VER;
+      s.src = BASE + "programs-services.js?v=" + CSS_VER;
       s.setAttribute("data-lmc-programs-map", BASE + "canada-map.svg");
+      s.setAttribute("data-lmc-programs-mode", "indigenous-only");
+      s.setAttribute("data-lmc-indigenous-programs-static-base", BASE);
       s.defer = true;
       s.onerror = function () {
         console.error("[LMC programs] Failed to load programs-services.js");
