@@ -87,12 +87,11 @@
         '<div class="input-block">' +
         '<select class="form-select form-input js-provinces item-code" id="program-location" name="location">' +
         provinces +
-        "</select></div></div></div>" +
-        '<div class="form-block">' +
+        "</select></div></div>" +
         '<div class="form-block__item">' +
-        '<label for="postalCode">Postal code</label>' +
+        '<label for="postalCode">Postal Code</label>' +
         '<div class="input-block">' +
-        '<input id="postalCode" name="postalCode" type="text" placeholder="e.g. M5V 1J2" class="form-input js-provinces item-code" autocomplete="postal-code" />' +
+        '<input id="postalCode" name="postalCode" type="text" placeholder="code" class="form-input js-provinces item-code" autocomplete="postal-code" />' +
         "</div></div>" +
         '<div class="form-block__item">' +
         '<label for="program-radius">Distance</label>' +
@@ -101,15 +100,18 @@
         '<option value="50">50 km</option>' +
         '<option value="100">100 km</option>' +
         '<option value="250">250 km</option>' +
-        '<option selected="selected" value="0">Full prov/terr</option>' +
-        "</select></div></div>" +
-        '<div class="form-buttons-container">' +
+        '<option selected="selected" value="0">Full Prov/Terr</option>' +
+        "</select></div>" +
+        '<div class="form-block__item lmc-indigenous-search-form__btn">' +
+        '<span class="lmc-indigenous-search-form__btn-label" aria-hidden="true">&nbsp;</span>' +
         '<div class="input-block">' +
         '<button id="submit" type="submit" class="form-submit">Search&nbsp;<i class="fas fa-angle-right"></i></button>' +
-        "</div>" +
+        "</div></div>" +
+        '<div class="form-block__item lmc-indigenous-search-form__btn">' +
+        '<span class="lmc-indigenous-search-form__btn-label" aria-hidden="true">&nbsp;</span>' +
         '<div class="input-block">' +
         '<button id="reset" type="button" class="program-reset">Reset</button>' +
-        "</div></div></form></div>"
+        "</div></div></div></form></div>"
     );
   }
 

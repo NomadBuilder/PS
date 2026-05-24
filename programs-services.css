@@ -866,3 +866,73 @@ a:hover {
   margin-top: 0.5rem;
 }
 
+/* Indigenous search: one row (province, postal, distance, search, reset). */
+.lmc-programs-indigenous-only .lmc-indigenous-search-form .form-block {
+  display: grid !important;
+  grid-template-columns: minmax(0, 2fr) minmax(72px, 1fr) minmax(0, 1.15fr) auto auto !important;
+  gap: 12px 16px;
+  align-items: end;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.lmc-programs-indigenous-only .lmc-indigenous-search-form .form-block__item {
+  min-width: 0;
+  max-width: none;
+}
+
+.lmc-indigenous-search-form .form-block {
+  align-items: end;
+}
+
+.lmc-indigenous-search-form__btn-label {
+  display: block;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+  visibility: hidden;
+  user-select: none;
+}
+
+.lmc-indigenous-search-form__btn .form-submit,
+.lmc-indigenous-search-form__btn .program-reset {
+  width: 100%;
+  min-width: 0;
+}
+
+@media screen and (max-width: 720px) {
+  .lmc-programs-indigenous-only .lmc-indigenous-search-form .form-block {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .lmc-programs-indigenous-only
+    .lmc-indigenous-search-form
+    .form-block__item:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .lmc-programs-indigenous-only .lmc-indigenous-search-form .form-block {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media screen and (min-width: 721px) {
+  .lmc-indigenous-search-form__btn .form-submit {
+    min-width: 110px;
+  }
+
+  .lmc-indigenous-search-form__btn .program-reset {
+    min-width: 90px;
+  }
+}
+
+@media screen and (max-width: 639px) {
+  .lmc-indigenous-search-form__btn .form-submit,
+  .lmc-indigenous-search-form__btn .program-reset {
+    min-height: 48px;
+    justify-content: center;
+  }
+}
+
