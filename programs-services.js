@@ -420,7 +420,7 @@
     });
   }
 
-  /** Map widget payload to About Grief Umbraco POST names (dual keys — matches their form + legacy binders). */
+  /** Map widget payload to About Grief Umbraco POST names. */
   function toAboutGriefPostData(data) {
     data = data || {};
     var loc = typeof data.location === "string" ? data.location : "";
@@ -429,17 +429,30 @@
     var rad =
       data.radius != null && data.radius !== "" ? String(data.radius) : "0";
     var pc = typeof data.postalCode === "string" ? $.trim(data.postalCode) : "";
-    var payload = {
-      SelectedLocation: loc,
-      SelectedCategory: cat,
-      SelectedSubcategory: sub,
-      SelectedRadius: rad,
-      postalCode: pc,
-      location: loc,
-      category: cat,
-      subcategory: sub,
-      radius: rad,
-    };
+    var payload;
+    /* Browse (Full Prov/Terr): dual keys match About Grief province breakdown. */
+    if (rad === "0") {
+      payload = {
+        SelectedLocation: loc,
+        SelectedCategory: cat,
+        SelectedSubcategory: sub,
+        SelectedRadius: rad,
+        postalCode: pc,
+        location: loc,
+        category: cat,
+        subcategory: sub,
+        radius: rad,
+      };
+    } else {
+      /* Distance filter: legacy duplicate keys cause HTTP 500 on Umbraco POST. */
+      payload = {
+        SelectedLocation: loc,
+        SelectedCategory: cat,
+        SelectedSubcategory: sub,
+        SelectedRadius: rad,
+        postalCode: pc,
+      };
+    }
     if (data.page) {
       payload.page = data.page;
     }
