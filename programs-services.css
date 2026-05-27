@@ -870,6 +870,20 @@ a:hover {
   margin-top: 0.5rem;
 }
 
+.lmc-province-empty-msg,
+.lmc-category-empty-msg {
+  margin: 8px 0 16px;
+  padding: 12px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--lmc-text);
+  font-style: italic;
+}
+
+.faq__item-accordion.-active + .faq__items-wrapper .lmc-category-empty-msg {
+  display: block;
+}
+
 /* Indigenous search: one row (province, postal, distance, search, reset). */
 .lmc-programs-indigenous-only .lmc-indigenous-search-form .form-block {
   display: grid !important;

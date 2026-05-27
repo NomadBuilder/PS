@@ -204,6 +204,11 @@
     $c.find(".faq__item-info").hide();
   }
 
+  /** True when a category block has at least one program listing title. */
+  function categoryWrapperHasListings($wrapper) {
+    return $wrapper.find(".program-item-title").length > 0;
+  }
+
   /**
    * About Grief sometimes omits the category accordion when a province has one listing
    * (e.g. Alberta, New Brunswick). Insert a header so listings sit behind a closed accordion.
@@ -215,7 +220,9 @@
       if ($items.children(".faq__item-accordion").length) {
         return;
       }
-      if (!$items.children(".faq__items-wrapper").length) {
+      var $wrapper = $items.children(".faq__items-wrapper").first();
+      if (!$wrapper.length || !categoryWrapperHasListings($wrapper)) {
+        $items.addClass("lmc-category-empty").hide();
         return;
       }
       var label = "Programs and services";
@@ -232,11 +239,58 @@
     });
   }
 
+  /** Hide category rows with no listings; note when a province block is empty. */
+  function pruneEmptyCategoryAccordions() {
+    var $c = $("#results-container");
+
+    $c.find(".faq__item-accordion").each(function () {
+      var $acc = $(this);
+      var $items = $acc.closest(".faq__items");
+      var $wrapper = $acc.next(".faq__items-wrapper");
+      if ($wrapper.length && categoryWrapperHasListings($wrapper)) {
+        return;
+      }
+      $items.addClass("lmc-category-empty").hide();
+    });
+
+    $c.find(".program-service-block .faq > .faq__items").each(function () {
+      var $items = $(this);
+      if ($items.is(":hidden")) {
+        return;
+      }
+      if ($items.children(".faq__item-accordion").length) {
+        return;
+      }
+      var $wrapper = $items.children(".faq__items-wrapper").first();
+      if (!$wrapper.length || !categoryWrapperHasListings($wrapper)) {
+        $items.addClass("lmc-category-empty").hide();
+      }
+    });
+
+    $c.find(".program-service-block").each(function () {
+      var $block = $(this);
+      $block.find(".lmc-province-empty-msg").remove();
+      if ($block.find(".program-item-title").length) {
+        return;
+      }
+      var province = $.trim(
+        $block.prevAll(".program-service__title").first().text()
+      );
+      var place = province ? " for " + province : "";
+      $block.find(".faq").first().append(
+        '<p class="lmc-province-empty-msg">No Indigenous programs are listed' +
+          place +
+          ".</p>"
+      );
+    });
+  }
+
   function normalizeIndigenousResultsAccordions() {
     if (!isIndigenousOnlyMode()) {
       return;
     }
     repairOrphanCategoryAccordions();
+    pruneEmptyCategoryAccordions();
     collapseAllResultsAccordions();
   }
 
@@ -999,6 +1053,19 @@
         var $acc = $(this);
         $acc.toggleClass("-active");
         $acc.find(".faq__item-icon").toggleClass("-active");
+        var $wrapper = $acc.next(".faq__items-wrapper");
+        if (!$wrapper.length) {
+          return;
+        }
+        $wrapper.find(".lmc-category-empty-msg").remove();
+        if (
+          $acc.hasClass("-active") &&
+          !categoryWrapperHasListings($wrapper)
+        ) {
+          $wrapper.append(
+            '<p class="lmc-category-empty-msg">No programs are listed in this category.</p>'
+          );
+        }
       }
     );
 
