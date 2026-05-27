@@ -200,8 +200,7 @@
   /** Close every category and listing accordion after results HTML is injected. */
   function collapseAllResultsAccordions() {
     var $c = $("#results-container");
-    $c.find(".faq__item-accordion").removeClass("-active");
-    $c.find(".faq__item-icon").removeClass("-active");
+    $c.find(".faq__item-accordion, .faq__item-icon").removeClass("-active");
     $c.find(".faq__item-info").hide();
   }
 
