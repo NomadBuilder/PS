@@ -531,6 +531,12 @@ a:hover {
   padding: 4px 0 8px;
 }
 
+/* Orphan province blocks (no category header in source HTML) — hidden until synthetic header is opened. */
+.lmc-programs-indigenous-only #results-container .faq__items > .faq__items-wrapper {
+  display: none;
+  padding: 4px 0 8px;
+}
+
 .faq__item-accordion.-active + .faq__items-wrapper {
   display: block;
 }

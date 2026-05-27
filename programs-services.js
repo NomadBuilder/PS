@@ -197,6 +197,50 @@
     $c.find(".click-text.display-grief").remove();
   }
 
+  /** Close every category and listing accordion after results HTML is injected. */
+  function collapseAllResultsAccordions() {
+    var $c = $("#results-container");
+    $c.find(".faq__item-accordion").removeClass("-active");
+    $c.find(".faq__item-icon").removeClass("-active");
+    $c.find(".faq__item-info").hide();
+  }
+
+  /**
+   * About Grief sometimes omits the category accordion when a province has one listing
+   * (e.g. Alberta, New Brunswick). Insert a header so listings sit behind a closed accordion.
+   */
+  function repairOrphanCategoryAccordions() {
+    var $c = $("#results-container");
+    $c.find(".program-service-block .faq > .faq__items").each(function () {
+      var $items = $(this);
+      if ($items.children(".faq__item-accordion").length) {
+        return;
+      }
+      if (!$items.children(".faq__items-wrapper").length) {
+        return;
+      }
+      var label = "Programs and services";
+      var $acc = $(
+        '<div class="faq__item-accordion lmc-synthetic-category">' +
+          '<h3 class="h3"></h3>' +
+          '<span class="faq__item-icon">' +
+          '<i class="fas fa-plus"></i>' +
+          '<i class="fas fa-minus"></i>' +
+          "</span></div>"
+      );
+      $acc.find(".h3").text(label);
+      $items.prepend($acc);
+    });
+  }
+
+  function normalizeIndigenousResultsAccordions() {
+    if (!isIndigenousOnlyMode()) {
+      return;
+    }
+    repairOrphanCategoryAccordions();
+    collapseAllResultsAccordions();
+  }
+
   /**
    * Listings use root-relative URLs (/Assets/..., /media/...). On LMC or GitHub
    * Pages those resolve to the wrong host and icons break — point them at About Grief.
@@ -398,9 +442,11 @@
 
   function renderResultsHtml(html, scrollToResults) {
     $("#results-container").html(html);
-    enhanceNationalDefaultView();
     if (isIndigenousOnlyMode()) {
       postProcessIndigenousOnlyResultsHtml();
+      normalizeIndigenousResultsAccordions();
+    } else {
+      enhanceNationalDefaultView();
     }
     if (scrollToResults) {
       scrollResultsIntoView();
