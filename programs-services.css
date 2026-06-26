@@ -8,8 +8,9 @@
   --lmc-text-muted: #527883;
   --lmc-link: #018391;
   --lmc-link-hover: #106476;
-  /* About Grief display heading hue (Capriola on AG); keeps LMC-adjacent teal */
-  --ag-heading: #317d73;
+  /* Section headings: LMC culture hub style (MetaPro, #018391) */
+  --lmc-heading: #018391;
+  --ag-heading: #018391;
   --lmc-navy: #27326b;
   --lmc-navy-hover: #315a85;
   --lmc-culture: #00a6c9;
@@ -21,7 +22,7 @@
   --lmc-white: #fff;
   --lmc-max: 1100px;
   --font-display: Capriola, MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --lmc-programs-hero-title: #ce5b48;
+  --lmc-programs-hero-title: #018391;
   --lmc-programs-hero-lead: #215352;
 }
 
@@ -136,7 +137,7 @@ a:hover {
 .lmc-programs-hero__title {
   margin: 0 0 8px;
   padding: 0;
-  font: 400 clamp(1.65rem, 2.2vw + 1rem, 2.25rem) / 1.2 var(--font-display);
+  font: 700 24px/30px MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--lmc-programs-hero-title);
 }
 
@@ -268,8 +269,8 @@ a:hover {
 .program-service h2.h2 {
   margin: 0 0 12px;
   padding: 0;
-  font: 400 24px/30px var(--font-display);
-  color: var(--lmc-link);
+  font: 700 24px/30px MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-heading);
 }
 
 .program-service__form {
@@ -348,6 +349,11 @@ a:hover {
   outline: 2px solid rgba(0, 166, 201, 0.35);
   outline-offset: 0;
   border-color: var(--lmc-culture);
+}
+
+.program-service .form-input::placeholder {
+  color: var(--lmc-text-muted);
+  opacity: 1;
 }
 
 .form-buttons-container {
@@ -447,8 +453,8 @@ a:hover {
 .program-service__title {
   margin: 1.5rem 0 12px;
   padding: 8px 0 0;
-  font: 400 30px/1.2 var(--font-display);
-  color: var(--ag-heading);
+  font: 700 24px/1.3 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-heading);
 }
 
 .program-service__text-block {
@@ -510,20 +516,21 @@ a:hover {
   width: 100%;
   margin: 6px 0 4px;
   padding: 0;
-  font: 400 25px/1.2 var(--font-display);
-  color: var(--ag-heading);
+  font: 700 22px/1.3 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--lmc-heading);
   cursor: pointer;
 }
 
 .faq__item-accordion .faq__item-icon,
+#results-container .faq__item-icon,
 #results-container .faq__item-icon .fas {
   flex-shrink: 0;
   font-size: 15px;
-  color: #0557b4;
+  color: var(--lmc-link) !important;
 }
 
 #results-container .faq__item-icon.-active .fas {
-  color: #0557b4;
+  color: var(--lmc-link) !important;
 }
 
 .faq__item-accordion + .faq__items-wrapper {
@@ -557,8 +564,8 @@ a:hover {
   margin: 0 0 8px;
   padding-top: 4px;
   font: 700 19px/1.3 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: var(--lmc-text);
-  text-transform: uppercase;
+  color: var(--lmc-heading);
+  text-transform: none;
 }
 
 #results-container .faq__items-sub + .faq__items-sub h4 {
@@ -574,7 +581,7 @@ a:hover {
   border-bottom: none;
 }
 
-/* About Grief .faq__item-title: 20px / 600 / #0557b4 */
+/* Listing titles — LMC teal (not About Grief blue/green) */
 .faq__item-title,
 .program-service__lists .faq__item-title {
   display: flex;
@@ -583,8 +590,15 @@ a:hover {
   width: calc(100% - 30px);
   padding: 2px 15px;
   font: 600 20px/1.3 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #0557b4;
+  color: var(--lmc-link);
   cursor: pointer;
+}
+
+.faq__item-block .faq__item-icon,
+.faq__item-block .faq__item-icon .fas,
+.faq__item-title .faq__item-icon,
+.faq__item-title .faq__item-icon .fas {
+  color: var(--lmc-link) !important;
 }
 
 .faq__item-block {
@@ -638,6 +652,19 @@ a:hover {
   font-size: 15px;
   line-height: 1.55;
   color: var(--lmc-text);
+}
+
+.faq__item-info a,
+.contacts-block a,
+.contacts-block__item a,
+#results-container .faq__item-info a {
+  color: var(--lmc-link) !important;
+}
+
+.faq__item-info a:hover,
+.contacts-block a:hover,
+#results-container .faq__item-info a:hover {
+  color: var(--lmc-link-hover) !important;
 }
 
 .contacts-block__item {
@@ -704,10 +731,11 @@ a:hover {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  font-weight: 600;
+  font: 700 15px/1.2 MetaPro, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--lmc-white);
-  background: var(--lmc-link);
-  border-radius: 2px;
+  background: var(--lmc-heading);
+  border-radius: 10px;
+  transition: background 0.15s ease;
 }
 
 .btn-more:hover {
@@ -866,6 +894,10 @@ a:hover {
   display: none !important;
 }
 
+.lmc-programs-indigenous-only .lmc-indigenous-category-field {
+  display: block !important;
+}
+
 .lmc-programs-indigenous-only .lmc-map-hint {
   margin-top: 0.5rem;
 }
@@ -887,8 +919,10 @@ a:hover {
 /* Indigenous search: one row (province, postal, distance, search, reset). */
 .lmc-programs-indigenous-only .lmc-indigenous-search-form .form-block {
   display: grid !important;
-  grid-template-columns: minmax(0, 2fr) minmax(72px, 1fr) minmax(0, 1.15fr) auto auto !important;
-  gap: 12px 16px;
+  grid-template-columns:
+    minmax(0, 1.35fr) minmax(72px, 0.9fr) minmax(0, 1fr) minmax(0, 1.15fr) auto
+    auto !important;
+  gap: 12px 14px;
   align-items: end;
   width: 100%;
   margin-bottom: 0;
@@ -916,6 +950,18 @@ a:hover {
 .lmc-indigenous-search-form__btn .program-reset {
   width: 100%;
   min-width: 0;
+}
+
+@media screen and (max-width: 1100px) {
+  .lmc-programs-indigenous-only .lmc-indigenous-search-form .form-block {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .lmc-programs-indigenous-only
+    .lmc-indigenous-search-form
+    .form-block__item:first-child {
+    grid-column: 1 / -1;
+  }
 }
 
 @media screen and (max-width: 720px) {

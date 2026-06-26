@@ -5,6 +5,16 @@
   var ABOUT_GRIEF_ORIGIN = "https://aboutgrief.ca";
   var INDIGENOUS_SUBCATEGORY = "Indigenous";
 
+  var SERVICE_CATEGORY_OPTIONS =
+    '<option value="">All service types</option>' +
+    '<option value="Counselling">Counselling</option>' +
+    '<option value="Support Groups">Support Groups</option>' +
+    '<option value="Crisis Lines">Crisis Lines</option>' +
+    '<option value="Phone Support">Phone Support</option>' +
+    '<option value="Camps">Camps</option>' +
+    '<option value="Education">Education</option>' +
+    '<option value="Other">Other</option>';
+
   var manifestPromise = null;
   var indigenousManifestPromise = null;
 
@@ -47,7 +57,7 @@
   function indigenousSearchPayloadFromForm() {
     return {
       location: $("#program-location").val() || "",
-      category: "",
+      category: $("#program-category").val() || "",
       subcategory: INDIGENOUS_SUBCATEGORY,
       radius: $("#program-radius").val() || "0",
       postalCode: $.trim($("input#postalCode").val() || ""),
@@ -74,7 +84,6 @@
     $("#search-container").html(
       '<div class="program-service__form lmc-indigenous-search-form">' +
         '<form id="programs-services-form" action="#">' +
-        '<input type="hidden" id="program-category" name="category" value="" />' +
         '<select id="program-subcategory" name="subcategory" hidden aria-hidden="true" tabindex="-1">' +
         '<option value="' +
         INDIGENOUS_SUBCATEGORY +
@@ -91,7 +100,7 @@
         '<div class="form-block__item">' +
         '<label for="postalCode">Postal Code</label>' +
         '<div class="input-block">' +
-        '<input id="postalCode" name="postalCode" type="text" placeholder="code" class="form-input js-provinces item-code" autocomplete="postal-code" />' +
+        '<input id="postalCode" name="postalCode" type="text" placeholder="Enter postal code" class="form-input js-provinces item-code" autocomplete="postal-code" />' +
         "</div></div>" +
         '<div class="form-block__item">' +
         '<label for="program-radius">Distance</label>' +
@@ -102,6 +111,12 @@
         '<option value="250">250 km</option>' +
         '<option selected="selected" value="0">Full Prov/Terr</option>' +
         "</select></div>" +
+        '<div class="form-block__item lmc-indigenous-category-field">' +
+        '<label for="program-category">Service type</label>' +
+        '<div class="input-block">' +
+        '<select class="form-select" id="program-category" name="category">' +
+        SERVICE_CATEGORY_OPTIONS +
+        "</select></div></div>" +
         '<div class="form-block__item lmc-indigenous-search-form__btn">' +
         '<span class="lmc-indigenous-search-form__btn-label" aria-hidden="true">&nbsp;</span>' +
         '<div class="input-block">' +
@@ -122,6 +137,7 @@
     }
     $("#program-category")
       .closest(".form-block__item")
+      .not(".lmc-indigenous-category-field")
       .addClass("lmc-indigenous-hide-field")
       .attr("aria-hidden", "true");
     var $sub = $("#program-subcategory");
@@ -1115,6 +1131,7 @@
       updateQueryString("subcategory", INDIGENOUS_SUBCATEGORY);
       var payload = indigenousSearchPayloadFromForm();
       updateQueryString("location", payload.location || "");
+      updateQueryString("category", payload.category || "");
       updateQueryString("radius", payload.radius || "0");
       updateQueryString("postalCode", payload.postalCode || "");
       refreshResults(payload, false);
