@@ -6,7 +6,7 @@
   var INDIGENOUS_SUBCATEGORY = "Indigenous";
 
   var SERVICE_CATEGORY_OPTIONS =
-    '<option value="">All service types</option>' +
+    '<option value="">Select</option>' +
     '<option value="Counselling">Counselling</option>' +
     '<option value="Support Groups">Support Groups</option>' +
     '<option value="Crisis Lines">Crisis Lines</option>' +
@@ -112,7 +112,7 @@
         '<option selected="selected" value="0">Full Prov/Terr</option>' +
         "</select></div>" +
         '<div class="form-block__item lmc-indigenous-category-field">' +
-        '<label for="program-category">Service type</label>' +
+        '<label for="program-category">Type</label>' +
         '<div class="input-block">' +
         '<select class="form-select" id="program-category" name="category">' +
         SERVICE_CATEGORY_OPTIONS +
@@ -369,6 +369,9 @@
     }
     var rad = data.radius || "0";
     if (rad && rad !== "0") {
+      return false;
+    }
+    if ($.trim(data.category || "") !== "") {
       return false;
     }
     return true;
@@ -1040,6 +1043,13 @@
 
     $(document).on("change blur", "#postalCode", function () {
       setProvinceFromPostalCode();
+    });
+
+    $(document).on("change", "#program-category", function () {
+      if (!isIndigenousOnlyMode()) {
+        return;
+      }
+      $("#submit").trigger("click");
     });
 
     $(document).on("click", "#pagination_button", function (e) {

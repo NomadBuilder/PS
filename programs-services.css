@@ -55,6 +55,19 @@ body.lmc-programs-page {
   box-sizing: border-box;
 }
 
+/* Filled CTA links must stay readable when LMC/global `a:hover` sets link color. */
+.lmc-programs-gtm-root a.btn-more,
+.lmc-programs-gtm-root a.btn-more:hover,
+.lmc-programs-gtm-root a.btn-more:focus-visible {
+  color: var(--lmc-white);
+  text-decoration: none;
+}
+
+.lmc-programs-gtm-root a.btn-more:hover i,
+.lmc-programs-gtm-root a.btn-more:focus-visible i {
+  color: var(--lmc-white);
+}
+
 /* GTM on LMC: widget mounts inside Umbraco div.center only. */
 .center .lmc-programs-gtm-root {
   clear: both;
@@ -738,9 +751,16 @@ a:hover {
   transition: background 0.15s ease;
 }
 
-.btn-more:hover {
+.btn-more:hover,
+.btn-more:focus-visible {
   background: var(--lmc-link-hover);
+  color: var(--lmc-white);
   text-decoration: none;
+}
+
+.btn-more:hover i,
+.btn-more:focus-visible i {
+  color: var(--lmc-white);
 }
 
 .lmc-loading {
