@@ -199,10 +199,14 @@
       var loc = $.trim($("#program-location").val() || "");
       var pc = $.trim($("input#postalCode").val() || "");
       var rad = $("#program-radius").val() || "0";
+      var cat = $.trim($("#program-category").val() || "");
       var place = loc
         ? " in <b>" + $("<span/>").text(loc).html() + "</b>"
         : " across <b>Canada</b>";
-      var msg = "Indigenous programs and services" + place;
+      var kind = cat
+        ? "Indigenous <b>" + $("<span/>").text(cat).html() + "</b> programs and services"
+        : "Indigenous programs and services";
+      var msg = kind + place;
       if (pc && rad && rad !== "0") {
         msg += " within <b>" + $("<span/>").text(rad).html() + " km</b> of <b>" + $("<span/>").text(pc).html() + "</b>";
       } else if (pc) {
@@ -227,10 +231,14 @@
 
   /**
    * About Grief sometimes omits the category accordion when a province has one listing
-   * (e.g. Alberta, New Brunswick). Insert a header so listings sit behind a closed accordion.
+   * (e.g. Alberta, New Brunswick), and always omits it when a Type filter is applied
+   * (results are already scoped to one category). Insert a header so listings sit behind
+   * a closed accordion. When a Type is selected, label it with that category so the
+   * heading matches the province-only view instead of a generic "Programs and services".
    */
   function repairOrphanCategoryAccordions() {
     var $c = $("#results-container");
+    var selectedCategory = $.trim($("#program-category").val() || "");
     $c.find(".program-service-block .faq > .faq__items").each(function () {
       var $items = $(this);
       if ($items.children(".faq__item-accordion").length) {
@@ -241,7 +249,7 @@
         $items.addClass("lmc-category-empty").hide();
         return;
       }
-      var label = "Programs and services";
+      var label = selectedCategory || "Programs and services";
       var $acc = $(
         '<div class="faq__item-accordion lmc-synthetic-category">' +
           '<h3 class="h3"></h3>' +
