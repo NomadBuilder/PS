@@ -1,5 +1,6 @@
 {
   "description": "Indigenous-only program listing snapshots from About Grief API (refreshed). Keys match #program-location / map data-location.",
+  "refreshedAt": "2026-07-21T14:46:28.439Z",
   "fragments": {
     "": "indigenous-fragments/indigenous-canada.html",
     "Alberta": "indigenous-fragments/indigenous-alberta.html",
@@ -15,6 +16,5 @@
     "Quebec": "indigenous-fragments/indigenous-quebec.html",
     "Saskatchewan": "indigenous-fragments/indigenous-saskatchewan.html",
     "Yukon": "indigenous-fragments/indigenous-yukon.html"
-  },
-  "refreshedAt": "2026-07-21T02:58:47.336Z"
+  }
 }
