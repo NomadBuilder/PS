@@ -28,6 +28,23 @@ Do not inject the tag twice (duplicate `#map-root` / `#results-container` IDs).
 
 ## Refresh static data from About Grief
 
+### Indigenous widget (automatic, daily)
+
+`indigenous-fragments/` is refreshed **every day at 14:00 UTC** by GitHub Actions (`.github/workflows/refresh-indigenous-static.yml`). If About Grief has new/changed listings, the workflow commits and pushes; otherwise it no-ops.
+
+You can also run it manually: **Actions → Refresh Indigenous static data → Run workflow**.
+
+Local / one-off:
+
+```bash
+cd PS
+node refresh-indigenous-static.js
+git add indigenous-fragments indigenous-programs-manifest.json
+git commit -m "Refresh Indigenous program static snapshots" && git push
+```
+
+### Full (non-Indigenous) programs set
+
 ```bash
 cd PS   # this repo
 python3 -m venv .venv
